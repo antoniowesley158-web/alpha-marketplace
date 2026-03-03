@@ -221,23 +221,34 @@
     renderCarrinho();
   }
 
-  document.getElementById('finalizar-pedido-btn').onclick = () => {
+  // Finalizar pedido (corrigido)
+  document.getElementById('finalizar-pedido-btn').onclick = async () => {
     const user = auth.currentUser;
     if(!user) return alert('Você precisa estar logado');
     if(carrinho.length===0) return alert('Carrinho vazio');
 
-    db.collection('pedidos').add({
-      userId: user.uid,
-      itens: carrinho,
-      data: new Date()
-    }).then(()=>{
+    try {
+      const itensPedidos = carrinho.map(i => ({
+        id: i.id,
+        nome: i.nome.toString(),
+        preco: parseFloat(i.preco)
+      }));
+
+      await db.collection('pedidos').add({
+        userId: user.uid,
+        itens: itensPedidos,
+        data: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
       alert('Pedido finalizado!');
       carrinho = [];
       renderCarrinho();
       carregarPedidos();
       showTab('meusPedidos');
-    });
-  }
+    } catch(err) {
+      alert('Erro ao criar pedido: ' + err.message);
+    }
+  };
 
   function carregarPedidos(){
     const lista = document.getElementById('lista-pedidos');
@@ -255,4 +266,4 @@
 
 </script>
 </body>
-</html>
+      </html>
