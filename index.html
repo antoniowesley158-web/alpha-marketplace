@@ -221,7 +221,7 @@
     renderCarrinho();
   }
 
-  // Finalizar pedido (corrigido)
+  // Finalizar pedido corrigido
   document.getElementById('finalizar-pedido-btn').onclick = async () => {
     const user = auth.currentUser;
     if(!user) return alert('Você precisa estar logado');
@@ -250,18 +250,29 @@
     }
   };
 
-  function carregarPedidos(){
+  // Carregar pedidos seguros
+  async function carregarPedidos(){
     const lista = document.getElementById('lista-pedidos');
     lista.innerHTML='';
     const user = auth.currentUser;
     if(!user) return;
-    db.collection('pedidos').where('userId','==',user.uid).get().then(snapshot=>{
-      snapshot.forEach(doc=>{
+
+    try {
+      const snapshot = await db.collection('pedidos')
+        .where('userId','==', user.uid)
+        .orderBy('data','desc')
+        .get();
+
+      snapshot.forEach(doc => {
         const pedido = doc.data();
-        const itens = pedido.itens.map(i=>`${i.nome} R$${i.preco.toFixed(2)}`).join(', ');
-        lista.innerHTML += `<div>${itens}</div>`;
+        if(pedido.itens && pedido.itens.length > 0){
+          const itens = pedido.itens.map(i => `${i.nome} R$${parseFloat(i.preco).toFixed(2)}`).join(', ');
+          lista.innerHTML += `<div>${itens}</div>`;
+        }
       });
-    });
+    } catch(err) {
+      alert('Erro ao carregar pedidos: ' + err.message);
+    }
   }
 
 </script>
