@@ -5,35 +5,71 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Alpha Marketplace</title>
 <style>
-  body {
-    font-family: sans-serif;
-    margin:0;
-    padding:0;
-    background-size: cover;
-    background-position: center;
-    transition: background 0.5s ease-in-out;
-  }
-  .container { 
-    background: rgba(255,255,255,0.95); 
-    padding: 20px; 
-    border-radius: 10px; 
-    box-shadow: 0 0 15px rgba(0,0,0,0.2); 
-    width: 90%; max-width: 400px; 
-    margin: 20px auto;
-    opacity:0; animation: fadeIn 0.5s forwards;
-  }
-  input, button { width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: 1px solid #ccc; transition: all 0.3s; }
-  button { border:none; background:#2e86de; color:#fff; font-weight:bold; cursor:pointer; }
-  button:hover { background:#2164a3; transform: scale(1.05); }
-  .link { text-align:center; margin-top:10px; cursor:pointer; color:#2e86de; }
-  #app { display:none; text-align:center; }
-  #lista-produtos div, #lista-carrinho div, #lista-pedidos div { margin:5px 0; padding:5px; border-bottom:1px solid #ccc; opacity:0; animation: fadeIn 0.5s forwards; }
-  #lista-produtos button, #lista-carrinho button { width:auto; padding:5px; margin-left:5px; }
-  @keyframes fadeIn { from {opacity:0; transform: translateY(10px);} to {opacity:1; transform: translateY(0);} }
-  .logo { width:120px; margin:10px auto; display:block; transition: transform 0.5s ease; }
-  .logo:hover { transform: scale(1.1); }
-  .tab { display:none; margin-top:10px; transition: all 0.5s; }
-  .tab.active { display:block; animation: fadeIn 0.5s forwards; }
+body {
+  font-family: sans-serif;
+  margin:0;
+  padding:0;
+  background-size: cover;
+  background-position: center;
+  transition: background 0.5s ease-in-out;
+}
+.container { 
+  background: rgba(255,255,255,0.95); 
+  padding: 20px; 
+  border-radius: 10px; 
+  box-shadow: 0 0 15px rgba(0,0,0,0.2); 
+  width: 90%; max-width: 400px; 
+  margin: 20px auto;
+  opacity:0; animation: fadeIn 0.5s forwards;
+}
+input, button { width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: 1px solid #ccc; transition: all 0.3s; }
+button { border:none; background:#2e86de; color:#fff; font-weight:bold; cursor:pointer; }
+button:hover { background:#2164a3; transform: scale(1.05); }
+.link { text-align:center; margin-top:10px; cursor:pointer; color:#2e86de; }
+#app { display:none; text-align:center; }
+#lista-produtos div, #lista-carrinho div, #lista-pedidos div { margin:5px 0; padding:5px; border-bottom:1px solid #ccc; opacity:0; animation: fadeIn 0.5s forwards; }
+#lista-produtos button, #lista-carrinho button { width:auto; padding:5px; margin-left:5px; }
+@keyframes fadeIn { from {opacity:0; transform: translateY(10px);} to {opacity:1; transform: translateY(0);} }
+.logo { width:120px; margin:10px auto; display:block; transition: transform 0.5s ease; }
+.logo:hover { transform: scale(1.1); }
+.tab { display:none; margin-top:10px; transition: all 0.5s; }
+.tab.active { display:block; animation: fadeIn 0.5s forwards; }
+
+/* Hamburger Menu */
+.hamburger-menu { position: relative; text-align:left; margin:10px; }
+#hamburger {
+  font-size: 20px;
+  cursor: pointer;
+  background: #2e86de;
+  color: #fff;
+  padding: 10px;
+  border-radius: 5px;
+  display: inline-block;
+  user-select: none;
+  transition: all 0.3s;
+}
+#hamburger:hover { background:#2164a3; transform: scale(1.05); }
+.menu-items {
+  display: none;
+  position: absolute;
+  top: 45px;
+  left: 0;
+  background: rgba(255,255,255,0.95);
+  border:1px solid #ccc;
+  border-radius: 5px;
+  box-shadow:0 2px 10px rgba(0,0,0,0.2);
+  width:150px;
+  animation: fadeIn 0.3s;
+  z-index:1000;
+}
+.menu-items div {
+  padding:10px;
+  cursor:pointer;
+  border-bottom:1px solid #eee;
+  transition: all 0.3s;
+}
+.menu-items div:hover { background:#f0f0f0; }
+.menu-items div:last-child { border-bottom:none; }
 </style>
 </head>
 <body id="body">
@@ -66,12 +102,15 @@
   <h2>Bem-vindo!</h2>
   <button id="logout-btn">Sair</button>
 
-  <!-- Abas -->
-  <div style="margin-top:20px;">
-    <button onclick="showTab('produtos')">Produtos</button>
-    <button onclick="showTab('carrinho')">Carrinho</button>
-    <button onclick="showTab('meusPedidos')">Meus Pedidos</button>
-    <button onclick="showTab('admin')" id="admin-btn" style="background:#27ae60;">Painel do Dono</button>
+  <!-- Hamburger Menu -->
+  <div class="hamburger-menu">
+    <div id="hamburger" onclick="toggleMenu()">☰ Menu</div>
+    <div id="menu-items" class="menu-items">
+      <div onclick="showTab('produtos')">Produtos</div>
+      <div onclick="showTab('carrinho')">Carrinho</div>
+      <div onclick="showTab('meusPedidos')">Meus Pedidos</div>
+      <div onclick="showTab('admin')">Painel do Dono</div>
+    </div>
   </div>
 
   <!-- Conteúdos -->
@@ -100,6 +139,7 @@
     <input type="text" id="novo-logo" placeholder="URL da logo">
     <input type="text" id="novo-fundo" placeholder="URL da foto de fundo">
     <button id="salvar-admin-btn" style="background:#27ae60;">Salvar Alterações</button>
+    <button id="criar-admin-btn" style="display:none;background:#e67e22;margin-top:10px;">Criar Admin</button>
   </div>
 </div>
 
@@ -109,6 +149,7 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
 <script>
+// Firebase config
 var firebaseConfig = {
   apiKey: "AIzaSyAkooYQtwZa3ijKAu8Zl8iNV3vedf3oplI",
   authDomain: "alpha-marketplace-a5bee.firebaseapp.com",
@@ -121,10 +162,12 @@ firebase.initializeApp(firebaseConfig);
 var auth = firebase.auth();
 var db = firebase.firestore();
 
+// Containers
 const loginContainer = document.getElementById('login-container');
 const registerContainer = document.getElementById('register-container');
 const appDiv = document.getElementById('app');
 
+// Mostrar cadastro/login
 document.getElementById('show-register').onclick = () => { loginContainer.style.display='none'; registerContainer.style.display='block'; }
 document.getElementById('show-login').onclick = () => { registerContainer.style.display='none'; loginContainer.style.display='block'; }
 
@@ -194,6 +237,11 @@ auth.onAuthStateChanged(user=>{
     renderCarrinho();
     carregarPedidos();
     checkAdmin(user);
+
+    // Botão criar admin
+    if(user.email === "seuemail@exemplo.com"){ 
+      document.getElementById('criar-admin-btn').style.display = 'inline-block';
+    }
   }
 });
 
@@ -308,6 +356,22 @@ document.getElementById('salvar-admin-btn').onclick=()=>{
   });
 }
 
+// Criar Admin direto pelo site
+document.getElementById('criar-admin-btn').onclick = () => {
+  const user = auth.currentUser;
+  if(!user) return alert('Precisa logar primeiro!');
+  db.collection('users').doc(user.uid).set({
+    name: user.displayName || "Admin",
+    email: user.email,
+    role: "admin"
+  }, {merge:true})
+  .then(() => {
+    alert('Usuário agora é admin.');
+    checkAdmin(user);
+  })
+  .catch(err => alert(err.message));
+};
+
 // Carregar config do admin
 db.collection('admin').doc('config').get().then(doc=>{
   if(doc.exists){
@@ -316,6 +380,23 @@ db.collection('admin').doc('config').get().then(doc=>{
     if(data.fundo) document.getElementById('body').style.background=`url(${data.fundo}) no-repeat center center/cover`;
   }
 });
+
+// Hamburger menu
+function toggleMenu(){
+  const menu = document.getElementById('menu-items');
+  if(menu.style.display === 'block'){
+    menu.style.display = 'none';
+  }else{
+    menu.style.display = 'block';
+  }
+}
+document.addEventListener('click', function(event){
+  const menu = document.getElementById('menu-items');
+  const hamb = document.getElementById('hamburger');
+  if(!hamb.contains(event.target) && !menu.contains(event.target)){
+    menu.style.display='none';
+  }
+});
 </script>
 </body>
-  </html>
+</html>
