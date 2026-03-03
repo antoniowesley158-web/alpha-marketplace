@@ -5,199 +5,171 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Alpha Marketplace</title>
 <style>
-body { font-family: Arial, sans-serif; margin:0; transition: background 0.3s; background:#f2f2f2; }
-header { display:flex; justify-content:space-between; align-items:center; padding:10px; background:#333; color:white; }
-#menu-hamburguer { cursor:pointer; font-size:24px; }
-#menu-lateral { position:fixed; left:-250px; top:0; width:250px; height:100%; background:#222; color:white; transition: left 0.3s; overflow:auto; z-index:999; }
-#menu-lateral.aberto { left:0; }
-#menu-lateral ul { list-style:none; padding:20px; margin:0; }
-#menu-lateral li { padding:10px 0; cursor:pointer; transition: background 0.2s; }
-#menu-lateral li:hover { background:#444; }
-#conteudo { padding:20px; display:flex; flex-wrap:wrap; gap:20px; justify-content:center; }
-.produto-card { background:white; padding:10px; width:200px; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.2); transition: transform 0.3s, box-shadow 0.3s; position:relative; }
-.produto-card:hover { transform: scale(1.05); box-shadow:0 4px 12px rgba(0,0,0,0.3); }
-.produto-card img { width:100%; border-radius:6px; }
-button { padding:10px 20px; border:none; cursor:pointer; transition: transform 0.2s; margin-top:5px; border-radius:5px; background:#0a84ff; color:white; }
-button:hover { transform: scale(1.05); }
-#painel-admin { display:none; background:#eee; padding:20px; position:fixed; top:10%; left:50%; transform:translateX(-50%); width:90%; max-width:400px; border-radius:10px; box-shadow:0 4px 10px rgba(0,0,0,0.3); z-index:1000; overflow:auto; max-height:80%; }
-#carrinho { display:none; position:fixed; top:10%; right:10px; background:white; padding:15px; border-radius:8px; box-shadow:0 4px 10px rgba(0,0,0,0.3); max-width:300px; z-index:999; }
-#login-btn { margin-right:10px; padding:5px 10px; border:none; border-radius:5px; cursor:pointer; background:#0a84ff; color:white; }
-#notificacao { position:fixed; top:20px; right:20px; background:#0a84ff; color:white; padding:10px 20px; border-radius:8px; opacity:0; transform:translateY(-20px); transition: opacity 0.5s, transform 0.5s; z-index:1001; }
+  @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Pacifico&display=swap');
+
+  body {
+    font-family: 'Roboto', sans-serif;
+    margin:0;
+    padding:0;
+    background: linear-gradient(120deg, #ff9a9e, #fad0c4);
+    transition: background 0.5s;
+  }
+
+  header {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:20px;
+    background: rgba(0,0,0,0.7);
+    color:white;
+    position: sticky;
+    top:0;
+    z-index:100;
+  }
+
+  header h1 {
+    font-family: 'Pacifico', cursive;
+    font-size:2rem;
+    margin:0;
+    cursor:pointer;
+    transition: transform 0.3s;
+  }
+  header h1:hover { transform: scale(1.1); }
+
+  header button {
+    padding:10px 20px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:bold;
+    transition: all 0.3s;
+    background:#0a84ff;
+    color:white;
+  }
+  header button:hover { transform: scale(1.05); background:#0066cc; }
+
+  main {
+    padding:50px 20px;
+    display:flex;
+    flex-direction: column;
+    align-items:center;
+    gap:40px;
+  }
+
+  .card {
+    background:white;
+    border-radius:12px;
+    padding:20px;
+    width:300px;
+    text-align:center;
+    box-shadow:0 4px 15px rgba(0,0,0,0.2);
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  .card:hover {
+    transform: translateY(-10px);
+    box-shadow:0 8px 25px rgba(0,0,0,0.3);
+  }
+
+  .card h2 {
+    color:#333;
+    margin-bottom:15px;
+  }
+  .card p span { background: #ffeaa7; padding:2px 6px; border-radius:4px; }
+
+  .cards-container {
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:30px;
+  }
+
+  #avisos {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #0a84ff;
+    color: white;
+    padding: 15px 20px;
+    border-radius: 10px;
+    font-weight: bold;
+    opacity:0;
+    pointer-events:none;
+    transition: opacity 0.5s, transform 0.5s;
+  }
+  #avisos.show {
+    opacity:1;
+    transform: translateY(10px);
+    pointer-events:auto;
+  }
+
+  footer {
+    margin-top:50px;
+    text-align:center;
+    color:#333;
+    padding:20px;
+  }
+
 </style>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js"></script>
 </head>
 <body>
 
 <header>
-  <div id="logo-container"><img id="logo" src="https://via.placeholder.com/50x50?text=Logo" alt="Logo" width="50"></div>
-  <div id="nome-loja-display" style="background:#fff;padding:2px 6px;border-radius:4px;color:#333;">Sua Loja</div>
-  <div>
-    <button id="login-btn">Login com Google</button>
-    <span id="usuario-logado"></span>
-    <div id="menu-hamburguer">☰</div>
-  </div>
+  <h1>Alpha Marketplace</h1>
+  <button id="criar-loja-btn">Criar sua loja →</button>
 </header>
 
-<nav id="menu-lateral">
-  <ul>
-    <li id="menu-produtos">Produtos</li>
-    <li id="menu-carrinho-btn">Carrinho</li>
-    <li id="menu-pedidos">Meus Pedidos</li>
-    <li id="menu-admin-btn">Painel do Dono</li>
-  </ul>
-</nav>
+<main>
+  <h2>Bem-vindo ao <span>Alpha Marketplace</span>!</h2>
+  <p>Crie sua própria loja online, personalize cores, layouts e produtos de forma <span>rápida e fácil</span>.</p>
 
-<main id="conteudo">
-  <!-- Produtos carregados via JS -->
+  <div class="cards-container">
+    <div class="card">
+      <h2>Layouts Bonitos</h2>
+      <p>Escolha entre vários <span>modelos de loja</span> e deixe a sua mais atrativa.</p>
+    </div>
+    <div class="card">
+      <h2>Produtos Ilimitados</h2>
+      <p>Adicione quantos produtos quiser, com imagens, preços e avaliações.</p>
+    </div>
+    <div class="card">
+      <h2>Planos Flexíveis</h2>
+      <p>Use o plano <span>Básico</span> ou assine o Plus para desbloquear todas as funcionalidades.</p>
+    </div>
+    <div class="card">
+      <h2>Animado e Interativo</h2>
+      <p>Notificações, animações e cores dinâmicas deixam sua loja <span>mais divertida</span>.</p>
+    </div>
+  </div>
 </main>
 
-<div id="carrinho">
-  <h3>Carrinho</h3>
-  <div id="itens-carrinho"></div>
-  <button id="finalizar-pedido">Finalizar Pedido</button>
-</div>
+<div id="avisos">Aviso exemplo!</div>
 
-<div id="painel-admin">
-  <h3>Painel do Dono</h3>
-  <input type="text" id="nome-empresa" placeholder="Nome da sua loja">
-  <textarea id="desc-loja" placeholder="Descrição da loja"></textarea>
-  <input type="text" id="logo-url" placeholder="URL da logo">
-  <input type="text" id="fundo-url" placeholder="URL do fundo">
-  <h4>Personalização de cores</h4>
-  <label>Cor de fundo: <input type="color" id="cor-fundo"></label>
-  <label>Cor dos botões: <input type="color" id="cor-botoes"></label>
-  <label>Cor do texto: <input type="color" id="cor-texto"></label>
-  <h4>Escolha de layout</h4>
-  <select id="layout-loja">
-    <option value="1">Layout 1</option>
-    <option value="2">Layout 2</option>
-    <option value="3">Layout 3</option>
-  </select>
-  <h4>Planos</h4>
-  <p>Básico: grátis (1 layout, 5 produtos, cores e logo padrão)</p>
-  <p>Plus: R$15,99/mês (todos layouts, produtos ilimitados, cores e animações)</p>
-  <button id="salvar-admin-btn">Salvar Alterações</button>
-</div>
-
-<div id="notificacao"></div>
+<footer>
+  &copy; 2026 Alpha Marketplace. Todos os direitos reservados.
+</footer>
 
 <script>
-// Firebase config
-const firebaseConfig = {
-  apiKey: "AIzaSyAkooYQtwZa3ijKAu8Zl8iNV3vedf3oplI",
-  authDomain: "alpha-marketplace-a5bee.firebaseapp.com",
-  projectId: "alpha-marketplace-a5bee",
-  storageBucket: "alpha-marketplace-a5bee.appspot.com",
-  messagingSenderId: "633576067411",
-  appId: "1:633576067411:web:f837cc956a21d02954d1a6"
-};
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
+  // Avisos animados
+  function mostrarAviso(msg){
+    const aviso = document.getElementById('avisos');
+    aviso.innerText = msg;
+    aviso.classList.add('show');
+    setTimeout(()=>aviso.classList.remove('show'), 3000);
+  }
 
-// Menu hamburguer
-const menu = document.getElementById('menu-lateral');
-document.getElementById('menu-hamburguer').onclick = () => menu.classList.toggle('aberto');
+  // Botão criar loja
+  document.getElementById('criar-loja-btn').onclick = ()=>{
+    mostrarAviso('Em breve você poderá criar sua loja!');
+    // Aqui depois você pode redirecionar pro login/cadastro
+  }
 
-// Login Google
-const loginBtn = document.getElementById('login-btn');
-const usuarioSpan = document.getElementById('usuario-logado');
-loginBtn.onclick = async () => {
-  const provider = new firebase.auth.GoogleAuthProvider();
-  try { await auth.signInWithPopup(provider); showNotificacao('Logado com sucesso!'); } 
-  catch(e){ showNotificacao('Erro no login'); }
-}
-auth.onAuthStateChanged(user => {
-  if(user){ usuarioSpan.innerText = user.displayName; loginBtn.style.display='none'; } 
-  else { usuarioSpan.innerText=''; loginBtn.style.display='inline-block'; }
-});
-
-// Produtos de exemplo
-const produtos = [
-  {id:1,nome:'Produto 1',desc:'Descrição do produto 1',preco:19.90,img:'https://via.placeholder.com/200x150',avaliacao:4},
-  {id:2,nome:'Produto 2',desc:'Descrição do produto 2',preco:29.90,img:'https://via.placeholder.com/200x150',avaliacao:3},
-];
-const conteudo = document.getElementById('conteudo');
-function carregarProdutos(){
-  conteudo.innerHTML='';
-  produtos.forEach(p=>{
-    const card = document.createElement('div'); card.className='produto-card';
-    card.dataset.id=p.id;
-    card.innerHTML=`<img src="${p.img}" alt="${p.nome}"><h3>${p.nome}</h3><p>${p.desc}</p><p>Preço: <span style="background:#ff0;">R$${p.preco.toFixed(2)}</span></p><p>Avaliação: ${'★'.repeat(p.avaliacao)+'☆'.repeat(5-p.avaliacao)}</p><button class="add-carrinho">Adicionar ao Carrinho</button>`;
-    conteudo.appendChild(card);
+  // Pequena animação do título
+  document.querySelector('header h1').addEventListener('mouseenter', ()=>{
+    document.querySelector('header h1').style.color = '#ffdd59';
   });
-  document.querySelectorAll('.add-carrinho').forEach(btn=>{
-    btn.onclick=(e)=>{
-      const card=e.target.closest('.produto-card');
-      const id=parseInt(card.dataset.id);
-      adicionarCarrinho(id);
-    }
+  document.querySelector('header h1').addEventListener('mouseleave', ()=>{
+    document.querySelector('header h1').style.color = 'white';
   });
-}
-carregarProdutos();
-
-// Carrinho
-let carrinho=[];
-const carrinhoDiv = document.getElementById('carrinho');
-document.getElementById('menu-carrinho-btn').onclick = ()=>{carrinhoDiv.style.display=carrinhoDiv.style.display==='block'?'none':'block';};
-function adicionarCarrinho(id){
-  const p=produtos.find(x=>x.id===id);
-  carrinho.push(p); atualizarCarrinho(); showNotificacao(`${p.nome} adicionado ao carrinho!`);
-}
-function atualizarCarrinho(){
-  const div=document.getElementById('itens-carrinho'); div.innerHTML='';
-  let total=0; carrinho.forEach((i,idx)=>{
-    div.innerHTML+=`<p>${i.nome} - R$${i.preco.toFixed(2)} <button onclick="removerCarrinho(${idx})">X</button></p>`;
-    total+=i.preco;
-  });
-  div.innerHTML+=`<p><b>Total: R$${total.toFixed(2)}</b></p>`;
-}
-function removerCarrinho(i){ carrinho.splice(i,1); atualizarCarrinho(); showNotificacao('Produto removido!'); }
-document.getElementById('finalizar-pedido').onclick=async()=>{
-  const user=auth.currentUser; if(!user){showNotificacao('Precisa logar para finalizar!'); return;}
-  const pedidoRef=db.collection('pedidos').doc();
-  await pedidoRef.set({usuario:user.uid,itens:carrinho,timestamp:firebase.firestore.FieldValue.serverTimestamp()});
-  showNotificacao('Pedido finalizado!');
-  carrinho=[]; atualizarCarrinho();
-}
-
-// Painel do dono
-const painel=document.getElementById('painel-admin');
-document.getElementById('menu-admin-btn').onclick = ()=>{ painel.style.display=painel.style.display==='block'?'none':'block'; };
-document.getElementById('salvar-admin-btn').onclick = async ()=>{
-  const user=auth.currentUser; if(!user){showNotificacao('Precisa logar como dono'); return;}
-  // Substitua pelo seu UID real
-  const UID_DO_DONO = "SEU_UID_AQUI";
-  if(user.uid!==UID_DO_DONO){showNotificacao('Você não tem permissão!'); return;}
-
-  const nome=document.getElementById('nome-empresa').value;
-  const desc=document.getElementById('desc-loja').value;
-  const logoUrl=document.getElementById('logo-url').value;
-  const fundoUrl=document.getElementById('fundo-url').value;
-  const corFundo=document.getElementById('cor-fundo').value;
-  const corBotoes=document.getElementById('cor-botoes').value;
-  const corTexto=document.getElementById('cor-texto').value;
-  const layout=document.getElementById('layout-loja').value;
-
-  document.getElementById('logo').src=logoUrl||'https://via.placeholder.com/50x50?text=Logo';
-  document.body.style.background=fundoUrl?`url(${fundoUrl}) no-repeat center/cover`:corFundo;
-  document.body.style.backgroundColor=corFundo;
-  document.querySelectorAll('button').forEach(btn=>btn.style.backgroundColor=corBotoes);
-  document.querySelectorAll('h1,h2,h3,h4,p,div,span').forEach(el=>el.style.color=corTexto);
-  document.getElementById('nome-loja-display').innerText=nome||'Sua Loja';
-  showNotificacao('Alterações salvas!');
-}
-
-// Notificações animadas
-const notificacaoDiv=document.getElementById('notificacao');
-function showNotificacao(msg){
-  notificacaoDiv.innerText=msg;
-  notificacaoDiv.style.opacity='1';
-  notificacaoDiv.style.transform='translateY(0)';
-  setTimeout(()=>{ notificacaoDiv.style.opacity='0'; notificacaoDiv.style.transform='translateY(-20px)'; },2000);
-}
 </script>
 
 </body>
