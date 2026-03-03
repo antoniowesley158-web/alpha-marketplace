@@ -8,73 +8,98 @@
   @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Pacifico&display=swap');
 
   body {
-    font-family: 'Roboto', sans-serif;
     margin:0;
-    padding:0;
-    background: linear-gradient(120deg, #ff9a9e, #fad0c4);
-    transition: background 0.5s;
+    font-family: 'Roboto', sans-serif;
+    background:#0a0a0a;
+    overflow-x:hidden;
+    color:white;
+  }
+
+  /* Fundo de estrelas animado */
+  body::before {
+    content:'';
+    position:fixed;
+    top:0; left:0;
+    width:100%; height:100%;
+    background:transparent url('https://i.ibb.co/8g0kHwD/stars.png') repeat;
+    animation:moveStars 60s linear infinite;
+    z-index:-1;
+  }
+  @keyframes moveStars {
+    from{background-position:0 0;}
+    to{background-position:-10000px 5000px;}
   }
 
   header {
+    position:fixed;
+    width:100%;
+    top:0;
+    left:0;
+    background: rgba(20,20,20,0.7); /* fumê */
+    backdrop-filter: blur(5px);
     display:flex;
     justify-content:space-between;
     align-items:center;
     padding:20px;
-    background: rgba(0,0,0,0.7);
-    color:white;
-    position: sticky;
-    top:0;
     z-index:100;
+    border-bottom: 2px solid #0af;
   }
 
   header h1 {
     font-family: 'Pacifico', cursive;
-    font-size:2rem;
-    margin:0;
+    font-size:2.2rem;
     cursor:pointer;
-    transition: transform 0.3s;
+    color:#0af;
+    text-shadow: 0 0 10px #0af, 0 0 20px #0af;
+    transition: 0.3s;
   }
-  header h1:hover { transform: scale(1.1); }
+  header h1:hover { text-shadow: 0 0 20px #fff, 0 0 30px #0af; }
 
   header button {
-    padding:10px 20px;
+    padding:12px 25px;
     border:none;
     border-radius:8px;
     cursor:pointer;
     font-weight:bold;
+    background:#0af;
+    color:#0a0a0a;
+    text-shadow:0 0 5px #0ff;
     transition: all 0.3s;
-    background:#0a84ff;
-    color:white;
+    box-shadow:0 0 10px #0af, 0 0 20px #0ff inset;
   }
-  header button:hover { transform: scale(1.05); background:#0066cc; }
+  header button:hover {
+    transform: scale(1.05);
+    box-shadow:0 0 20px #0ff, 0 0 30px #0af inset;
+  }
 
   main {
-    padding:50px 20px;
+    padding:140px 20px 50px 20px;
     display:flex;
     flex-direction: column;
     align-items:center;
-    gap:40px;
+    gap:50px;
   }
 
-  .card {
-    background:white;
-    border-radius:12px;
-    padding:20px;
-    width:300px;
+  .banner {
+    position:relative;
+    width:100%;
+    max-width:1200px;
+    height:400px;
+    background: linear-gradient(90deg, rgba(10,10,10,0.8), rgba(0,0,0,0.6)), url('https://i.ibb.co/yhhnR8x/lobo.png') center/cover no-repeat;
+    border-radius:20px;
+    box-shadow:0 0 30px #0af;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    color:#0ff;
+    font-size:2rem;
     text-align:center;
-    box-shadow:0 4px 15px rgba(0,0,0,0.2);
-    transition: transform 0.3s, box-shadow 0.3s;
+    animation:bannerGlow 3s ease-in-out infinite alternate;
   }
-  .card:hover {
-    transform: translateY(-10px);
-    box-shadow:0 8px 25px rgba(0,0,0,0.3);
+  @keyframes bannerGlow {
+    from{box-shadow:0 0 30px #0af;}
+    to{box-shadow:0 0 50px #0ff;}
   }
-
-  .card h2 {
-    color:#333;
-    margin-bottom:15px;
-  }
-  .card p span { background: #ffeaa7; padding:2px 6px; border-radius:4px; }
 
   .cards-container {
     display:flex;
@@ -83,18 +108,49 @@
     gap:30px;
   }
 
+  .card {
+    background: rgba(20,20,20,0.8);
+    border:2px solid #0af;
+    border-radius:15px;
+    width:280px;
+    padding:20px;
+    text-align:center;
+    box-shadow:0 0 15px #0af;
+    opacity:0;
+    transform: translateY(30px);
+    transition: all 0.7s ease;
+  }
+  .card.show {
+    opacity:1;
+    transform: translateY(0);
+  }
+
+  .card h2 {
+    color:#0ff;
+    margin-bottom:15px;
+    text-shadow:0 0 5px #0af;
+  }
+  .card p span {
+    background: #0af;
+    padding:3px 6px;
+    border-radius:4px;
+    font-weight:bold;
+    color:white;
+  }
+
   #avisos {
     position: fixed;
-    top: 20px;
-    right: 20px;
-    background: #0a84ff;
-    color: white;
-    padding: 15px 20px;
-    border-radius: 10px;
-    font-weight: bold;
+    top:20px;
+    right:20px;
+    background:#0af;
+    color:white;
+    padding:15px 20px;
+    border-radius:12px;
+    font-weight:bold;
     opacity:0;
     pointer-events:none;
     transition: opacity 0.5s, transform 0.5s;
+    box-shadow:0 0 15px #0ff;
   }
   #avisos.show {
     opacity:1;
@@ -105,39 +161,67 @@
   footer {
     margin-top:50px;
     text-align:center;
-    color:#333;
+    color:#0ff;
     padding:20px;
+    text-shadow:0 0 5px #0af;
   }
 
+  /* botão neon efeito pulsante */
+  .neon-btn {
+    animation: neonPulse 1.5s infinite alternate;
+  }
+  @keyframes neonPulse {
+    0%{ box-shadow:0 0 5px #0af, 0 0 20px #0ff inset; }
+    50%{ box-shadow:0 0 15px #0ff, 0 0 40px #0af inset; }
+    100%{ box-shadow:0 0 5px #0af, 0 0 20px #0ff inset; }
+  }
+
+  /* espaço para vídeo */
+  .video-placeholder {
+    width:100%;
+    max-width:900px;
+    height:400px;
+    background: rgba(0,0,0,0.7);
+    border-radius:20px;
+    border:2px solid #0ff;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:1.5rem;
+    text-align:center;
+    color:#0ff;
+    box-shadow:0 0 20px #0af;
+  }
 </style>
 </head>
 <body>
 
 <header>
   <h1>Alpha Marketplace</h1>
-  <button id="criar-loja-btn">Criar sua loja →</button>
+  <button id="criar-loja-btn" class="neon-btn">Criar sua loja →</button>
 </header>
 
 <main>
-  <h2>Bem-vindo ao <span>Alpha Marketplace</span>!</h2>
-  <p>Crie sua própria loja online, personalize cores, layouts e produtos de forma <span>rápida e fácil</span>.</p>
+  <div class="banner">Bem-vindo ao Alpha Marketplace! Crie sua loja com estilo e poder.</div>
+
+  <div class="video-placeholder">Espaço para vídeo chamativo (futuro)</div>
 
   <div class="cards-container">
     <div class="card">
-      <h2>Layouts Bonitos</h2>
-      <p>Escolha entre vários <span>modelos de loja</span> e deixe a sua mais atrativa.</p>
+      <h2>Layouts Profissionais</h2>
+      <p>Escolha entre vários <span>modelos de loja</span> com estilo e animações neon.</p>
     </div>
     <div class="card">
       <h2>Produtos Ilimitados</h2>
-      <p>Adicione quantos produtos quiser, com imagens, preços e avaliações.</p>
+      <p>Adicione produtos com <span>imagens, preços e avaliações</span> facilmente.</p>
     </div>
     <div class="card">
       <h2>Planos Flexíveis</h2>
-      <p>Use o plano <span>Básico</span> ou assine o Plus para desbloquear todas as funcionalidades.</p>
+      <p>Use o plano <span>Básico</span> ou desbloqueie tudo com o Plus.</p>
     </div>
     <div class="card">
-      <h2>Animado e Interativo</h2>
-      <p>Notificações, animações e cores dinâmicas deixam sua loja <span>mais divertida</span>.</p>
+      <h2>Notificações Animadas</h2>
+      <p>Avisos próprios, com <span>efeitos e animações</span> chamativas.</p>
     </div>
   </div>
 </main>
@@ -160,16 +244,26 @@
   // Botão criar loja
   document.getElementById('criar-loja-btn').onclick = ()=>{
     mostrarAviso('Em breve você poderá criar sua loja!');
-    // Aqui depois você pode redirecionar pro login/cadastro
   }
 
+  // Cards animados ao scroll
+  const cards = document.querySelectorAll('.card');
+  function mostrarCards(){
+    const triggerBottom = window.innerHeight * 0.85;
+    cards.forEach(card => {
+      const cardTop = card.getBoundingClientRect().top;
+      if(cardTop < triggerBottom){
+        card.classList.add('show');
+      }
+    });
+  }
+  window.addEventListener('scroll', mostrarCards);
+  mostrarCards();
+
   // Pequena animação do título
-  document.querySelector('header h1').addEventListener('mouseenter', ()=>{
-    document.querySelector('header h1').style.color = '#ffdd59';
-  });
-  document.querySelector('header h1').addEventListener('mouseleave', ()=>{
-    document.querySelector('header h1').style.color = 'white';
-  });
+  const title = document.querySelector('header h1');
+  title.addEventListener('mouseenter', ()=>{title.style.color='#fff';});
+  title.addEventListener('mouseleave', ()=>{title.style.color='#0af';});
 </script>
 
 </body>
