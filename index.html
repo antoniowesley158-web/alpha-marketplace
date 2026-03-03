@@ -5,13 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Alpha Marketplace</title>
 <style>
-  body { font-family: sans-serif; background: #f0f0f0; display: flex; justify-content: center; align-items: center; height: 100vh; }
+  body { font-family: sans-serif; background: #f0f0f0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
   .container { background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.2); width: 90%; max-width: 400px; }
-  input { width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: 1px solid #ccc; }
-  button { width: 100%; padding: 10px; margin-top: 10px; border: none; border-radius: 5px; background: #2e86de; color: #fff; font-weight: bold; cursor: pointer; }
+  input, button { width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: 1px solid #ccc; }
+  button { border: none; background: #2e86de; color: #fff; font-weight: bold; cursor: pointer; }
   button:hover { background: #2164a3; }
   .link { text-align: center; margin-top: 10px; cursor: pointer; color: #2e86de; }
   #app { display: none; text-align: center; }
+  #lista-produtos div, #lista-carrinho div, #lista-pedidos div { margin:5px 0; padding:5px; border-bottom:1px solid #ccc; }
+  #lista-produtos button, #lista-carrinho button { width:auto; padding:5px; margin-left:5px; }
 </style>
 </head>
 <body>
@@ -36,7 +38,7 @@
   <div class="link" id="show-login">Já tem conta? Login</div>
 </div>
 
-<!-- Área do app após login -->
+<!-- Área do app -->
 <div id="app">
   <h2>Bem-vindo!</h2>
   <button id="logout-btn">Sair</button>
@@ -44,6 +46,7 @@
   <!-- Abas -->
   <div style="margin-top:20px;">
     <button onclick="showTab('produtos')">Produtos</button>
+    <button onclick="showTab('carrinho')">Carrinho</button>
     <button onclick="showTab('meusPedidos')">Meus Pedidos</button>
   </div>
 
@@ -54,6 +57,12 @@
     <input type="text" id="novo-produto" placeholder="Nome do produto">
     <input type="number" id="novo-preco" placeholder="Preço">
     <button id="add-produto-btn">Adicionar Produto</button>
+  </div>
+
+  <div id="carrinho" style="display:none; margin-top:10px;">
+    <h3>Carrinho</h3>
+    <div id="lista-carrinho"></div>
+    <button id="finalizar-pedido-btn">Finalizar Pedido</button>
   </div>
 
   <div id="meusPedidos" style="display:none; margin-top:10px;">
@@ -68,7 +77,6 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
 <script>
-  // Configuração Firebase
   var firebaseConfig = {
     apiKey: "AIzaSyAkooYQtwZa3ijKAu8Zl8iNV3vedf3oplI",
     authDomain: "alpha-marketplace-a5bee.firebaseapp.com",
@@ -81,7 +89,6 @@
   var auth = firebase.auth();
   var db = firebase.firestore();
 
-  // Troca telas
   const loginContainer = document.getElementById('login-container');
   const registerContainer = document.getElementById('register-container');
   const appDiv = document.getElementById('app');
@@ -143,6 +150,8 @@
     auth.signOut().then(() => {
       appDiv.style.display='none';
       loginContainer.style.display='block';
+      carrinho = [];
+      renderCarrinho();
     });
   }
 
@@ -153,16 +162,18 @@
       registerContainer.style.display='none';
       appDiv.style.display='block';
       carregarProdutos();
+      renderCarrinho();
+      carregarPedidos();
     }
   });
 
-  // Troca de abas
   function showTab(tab) {
     document.getElementById('produtos').style.display = (tab==='produtos') ? 'block' : 'none';
+    document.getElementById('carrinho').style.display = (tab==='carrinho') ? 'block' : 'none';
     document.getElementById('meusPedidos').style.display = (tab==='meusPedidos') ? 'block' : 'none';
   }
 
-  // Adicionar produto
+  // Produtos
   document.getElementById('add-produto-btn').onclick = () => {
     const nome = document.getElementById('novo-produto').value;
     const preco = parseFloat(document.getElementById('novo-preco').value);
@@ -177,17 +188,71 @@
       });
   }
 
-  // Carregar produtos
   function carregarProdutos() {
     const lista = document.getElementById('lista-produtos');
     lista.innerHTML='';
     db.collection('produtos').get().then(snapshot => {
       snapshot.forEach(doc => {
         const produto = doc.data();
-        lista.innerHTML += `<div>${produto.nome} - R$${produto.preco.toFixed(2)}</div>`;
+        const btn = `<button onclick="adicionarCarrinho('${doc.id}','${produto.nome}',${produto.preco})">Adicionar ao carrinho</button>`;
+        lista.innerHTML += `<div>${produto.nome} - R$${produto.preco.toFixed(2)} ${btn}</div>`;
       });
     });
   }
+
+  // Carrinho
+  let carrinho = [];
+
+  function adicionarCarrinho(id,nome,preco){
+    carrinho.push({id,nome,preco});
+    renderCarrinho();
+  }
+
+  function renderCarrinho(){
+    const lista = document.getElementById('lista-carrinho');
+    lista.innerHTML='';
+    carrinho.forEach((item,i)=>{
+      lista.innerHTML += `<div>${item.nome} - R$${item.preco.toFixed(2)} <button onclick="removerCarrinho(${i})">X</button></div>`;
+    });
+  }
+
+  function removerCarrinho(index){
+    carrinho.splice(index,1);
+    renderCarrinho();
+  }
+
+  document.getElementById('finalizar-pedido-btn').onclick = () => {
+    const user = auth.currentUser;
+    if(!user) return alert('Você precisa estar logado');
+    if(carrinho.length===0) return alert('Carrinho vazio');
+
+    db.collection('pedidos').add({
+      userId: user.uid,
+      itens: carrinho,
+      data: new Date()
+    }).then(()=>{
+      alert('Pedido finalizado!');
+      carrinho = [];
+      renderCarrinho();
+      carregarPedidos();
+      showTab('meusPedidos');
+    });
+  }
+
+  function carregarPedidos(){
+    const lista = document.getElementById('lista-pedidos');
+    lista.innerHTML='';
+    const user = auth.currentUser;
+    if(!user) return;
+    db.collection('pedidos').where('userId','==',user.uid).get().then(snapshot=>{
+      snapshot.forEach(doc=>{
+        const pedido = doc.data();
+        const itens = pedido.itens.map(i=>`${i.nome} R$${i.preco.toFixed(2)}`).join(', ');
+        lista.innerHTML += `<div>${itens}</div>`;
+      });
+    });
+  }
+
 </script>
 </body>
-  </html>
+</html>
