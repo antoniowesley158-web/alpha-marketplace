@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Alpha Marketplace</title>
 
-<!-- Fontes gamer -->
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
 
 <style>
@@ -55,7 +54,7 @@ textarea, input { width:100%; padding:10px; border-radius:8px; border:2px solid 
 textarea:focus, input:focus { outline:none; border-color:#0ff; box-shadow:0 0 12px #0ff inset; }
 
 /* Avisos animados */
-#aviso { position:fixed; top:20px; right:20px; background:#0ff; color:#000; padding:15px 25px; border-radius:8px; display:none; animation:fadeInOut 2.5s ease forwards; font-weight:bold; z-index:999; }
+#aviso { position:fixed; top:20px; right:20px; background:#f00; color:#fff; padding:15px 25px; border-radius:8px; display:none; animation:fadeInOut 2.5s ease forwards; font-weight:bold; z-index:999; box-shadow:0 0 15px #f00; }
 @keyframes fadeInOut { 0%{opacity:0; transform:translateY(-20px);} 10%,90%{opacity:1; transform:translateY(0);} 100%{opacity:0; transform:translateY(-20px);} }
 </style>
 </head>
@@ -110,13 +109,14 @@ textarea:focus, input:focus { outline:none; border-color:#0ff; box-shadow:0 0 12
   <textarea id="admin-desc" placeholder="Descrição da Loja"></textarea>
   <input type="number" id="admin-estoque" placeholder="Estoque Total">
   <button id="salvar-admin">Salvar Alterações</button>
+  <button id="esqueci-senha">Esqueci a Senha</button>
 </section>
 
 <div id="aviso"></div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
-import { getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAkooYQtwZa3ijKAu8Zl8iNV3vedf3oplI",
@@ -126,7 +126,6 @@ const firebaseConfig = {
   messagingSenderId: "633576067411",
   appId: "1:633576067411:web:f837cc956a21d02954d1a6"
 };
-
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
@@ -177,6 +176,7 @@ document.getElementById('adicionar-produto').onclick = ()=>{
     div.className='produto-card';
     div.innerHTML = `<img src="${img}" alt="${nome}"><h3>${nome}</h3><p>Preço: R$${preco}</p><p>Estoque: ${estoque}</p>`;
     listaProdutos.appendChild(div);
+    mostrarAviso('Produto adicionado com sucesso!'); // Notificação vermelha
   }
 }
 
@@ -201,7 +201,7 @@ document.getElementById('salvar-descricao').onclick = ()=>{
 }
 
 // Admin (simples)
-const senhaAdmin = "1234"; // sua senha
+let senhaAdmin = "1234"; // sua senha
 document.querySelector('#menu-lateral li[data-secao="admin"]').onclick = ()=>{
   const input = prompt("Digite a senha do admin:");
   if(input===senhaAdmin){
@@ -212,6 +212,17 @@ document.querySelector('#menu-lateral li[data-secao="admin"]').onclick = ()=>{
   }
 }
 
+// Esqueci a senha
+document.getElementById('esqueci-senha').onclick = ()=>{
+  const email = prompt("Digite seu e-mail para recuperar a senha:");
+  if(email){
+    mostrarAviso(`Link de recuperação enviado para ${email}`);
+  } else {
+    mostrarAviso("E-mail não informado");
+  }
+}
+
+// Salvar admin
 document.getElementById('salvar-admin').onclick = ()=>{
   const nome = document.getElementById('admin-nome').value;
   const desc = document.getElementById('admin-desc').value;
