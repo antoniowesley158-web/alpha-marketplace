@@ -20,144 +20,102 @@ header { display:flex; justify-content:space-between; align-items:center; paddin
 .produto-card img { width:100%; border-radius:6px; }
 button { padding:10px 20px; border:none; cursor:pointer; transition: transform 0.2s; margin-top:5px; border-radius:5px; }
 button:hover { transform: scale(1.05); }
-#painel-admin { display:none; background:#eee; padding:20px; position:fixed; top:10%; left:50%; transform:translateX(-50%); width:90%; max-width:500px; border-radius:10px; box-shadow:0 4px 10px rgba(0,0,0,0.3); z-index:1000; }
+#painel-admin { display:none; background:#eee; padding:20px; position:fixed; top:5%; left:50%; transform:translateX(-50%); width:90%; max-width:520px; border-radius:10px; box-shadow:0 4px 12px rgba(0,0,0,0.3); z-index:1000; overflow:auto; max-height:90vh; }
+#painel-admin h3 { margin-top:0; }
+.admin-section { margin-bottom:20px; padding:10px; background:#ddd; border-radius:8px; }
+.admin-section label { display:block; margin:5px 0; }
 #carrinho { display:none; position:fixed; top:10%; right:10px; background:white; padding:15px; border-radius:8px; box-shadow:0 4px 10px rgba(0,0,0,0.3); max-width:300px; z-index:999; }
 #login-btn { margin-right:10px; padding:5px 10px; background:#0a84ff; color:white; border:none; border-radius:5px; cursor:pointer; }
 #notificacao { position: fixed; top: 20px; right: 20px; background: #0a84ff; color: white; padding: 12px 20px; border-radius: 8px; display: none; z-index: 999; box-shadow: 0 4px 12px rgba(0,0,0,0.3); font-weight: bold; transform: translateX(100%); transition: transform 0.5s ease, opacity 0.5s ease; opacity: 0; }
 </style>
 <script type="module">
-  // Firebase moderno
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
-  import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
-  import { getFirestore, collection, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
-  import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-storage.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
+import { getFirestore, collection, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-storage.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyAkooYQtwZa3ijKAu8Zl8iNV3vedf3oplI",
-    authDomain: "alpha-marketplace-a5bee.firebaseapp.com",
-    projectId: "alpha-marketplace-a5bee",
-    storageBucket: "alpha-marketplace-a5bee.appspot.com",
-    messagingSenderId: "633576067411",
-    appId: "1:633576067411:web:f837cc956a21d02954d1a6"
-  };
+const firebaseConfig = {
+  apiKey: "AIzaSyAkooYQtwZa3ijKAu8Zl8iNV3vedf3oplI",
+  authDomain: "alpha-marketplace-a5bee.firebaseapp.com",
+  projectId: "alpha-marketplace-a5bee",
+  storageBucket: "alpha-marketplace-a5bee.appspot.com",
+  messagingSenderId: "633576067411",
+  appId: "1:633576067411:web:f837cc956a21d02954d1a6"
+};
+const app = initializeApp(firebaseConfig);
+const auth = getAuth();
+const db = getFirestore();
+const storage = getStorage();
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth();
-  const db = getFirestore();
-  const storage = getStorage();
+// Menu
+const menu = document.getElementById('menu-lateral');
+document.getElementById('menu-hamburguer').onclick = () => menu.classList.toggle('aberto');
+document.getElementById('voltar').onclick = () => window.history.back();
 
-  // Menu hamburguer
-  const menu = document.getElementById('menu-lateral');
-  document.getElementById('menu-hamburguer').onclick = () => menu.classList.toggle('aberto');
+// Login
+const loginBtn = document.getElementById('login-btn');
+const usuarioSpan = document.getElementById('usuario-logado');
+const provider = new GoogleAuthProvider();
+loginBtn.onclick = async () => { try { await signInWithPopup(auth, provider); } catch(e){ mostrarNotificacao('Erro ao logar!'); } };
+onAuthStateChanged(auth,user=>{ if(user){ usuarioSpan.innerText=user.displayName; loginBtn.style.display='none'; } else { usuarioSpan.innerText=''; loginBtn.style.display='inline-block'; } });
 
-  // Seta voltar
-  document.getElementById('voltar').onclick = () => window.history.back();
+// Notificação animada
+function mostrarNotificacao(msg,destaque=null){
+  const div = document.getElementById('notificacao');
+  if(destaque){ div.innerHTML=msg.replace(destaque,`<span style="background:#ffd700;color:#000;padding:2px 5px;border-radius:3px;">${destaque}</span>`); } 
+  else{ div.innerHTML=msg; }
+  div.style.display='block';
+  setTimeout(()=>{ div.style.transform='translateX(0)'; div.style.opacity='1'; },10);
+  setTimeout(()=>{ div.style.transform='translateX(100%)'; div.style.opacity='0'; },3000);
+  setTimeout(()=>{ div.style.display='none'; },3500);
+}
 
-  // Login Google
-  const loginBtn = document.getElementById('login-btn');
-  const usuarioSpan = document.getElementById('usuario-logado');
-  const provider = new GoogleAuthProvider();
-  loginBtn.onclick = async () => {
-    try { await signInWithPopup(auth, provider); } 
-    catch(e){ mostrarNotificacao('Erro ao logar!'); console.error(e); }
-  }
-  onAuthStateChanged(auth, user => {
-    if(user){ usuarioSpan.innerText = user.displayName; loginBtn.style.display='none'; } 
-    else { usuarioSpan.innerText=''; loginBtn.style.display='inline-block'; }
-  });
+// Produtos
+const produtos=[
+  {id:1,nome:'Produto 1',desc:'Descrição do produto 1',preco:19.90,img:'https://via.placeholder.com/200x150',avaliacao:4},
+  {id:2,nome:'Produto 2',desc:'Descrição do produto 2',preco:29.90,img:'https://via.placeholder.com/200x150',avaliacao:3},
+];
+const conteudo=document.getElementById('conteudo');
+function carregarProdutos(){ conteudo.innerHTML=''; produtos.forEach(p=>{ const card=document.createElement('div'); card.className='produto-card'; card.dataset.id=p.id; card.innerHTML=`<img src="${p.img}" alt="${p.nome}"><h3>${p.nome}</h3><p>${p.desc}</p><p>Preço: <span style="background:#0a84ff;color:white;padding:2px 5px;border-radius:3px;">R$${p.preco.toFixed(2)}</span></p><p>Avaliação: ${'★'.repeat(p.avaliacao)+'☆'.repeat(5-p.avaliacao)}</p><button class="add-carrinho">Adicionar ao Carrinho</button>`; conteudo.appendChild(card); }); document.querySelectorAll('.add-carrinho').forEach(btn=>{ btn.onclick=(e)=>{ const card=e.target.closest('.produto-card'); const id=parseInt(card.dataset.id); adicionarCarrinho(id); } }); }
+carregarProdutos();
 
-  // Notificação animada
-  function mostrarNotificacao(msg, destaque=null){
-    const div = document.getElementById('notificacao');
-    if(destaque){
-      div.innerHTML = msg.replace(destaque, `<span style="background:#ffd700;color:#000;padding:2px 5px;border-radius:3px;">${destaque}</span>`);
-    } else { div.innerHTML = msg; }
-    div.style.display = 'block';
-    setTimeout(()=>{ div.style.transform = 'translateX(0)'; div.style.opacity='1'; },10);
-    setTimeout(()=>{ div.style.transform = 'translateX(100%)'; div.style.opacity='0'; },3000);
-    setTimeout(()=>{ div.style.display='none'; },3500);
-  }
+// Carrinho
+let carrinho=[];
+const carrinhoDiv=document.getElementById('carrinho');
+document.getElementById('menu-carrinho-btn').onclick=()=>{ carrinhoDiv.style.display=carrinhoDiv.style.display==='block'?'none':'block'; };
+function adicionarCarrinho(id){ const p=produtos.find(x=>x.id===id); carrinho.push(p); atualizarCarrinho(); mostrarNotificacao(`Produto "${p.nome}" adicionado ao carrinho!`, p.nome); }
+function atualizarCarrinho(){ const div=document.getElementById('itens-carrinho'); div.innerHTML=''; let total=0; carrinho.forEach((i,idx)=>{ div.innerHTML+=`<p>${i.nome} - <span style="background:#ffd700;color:#000;padding:2px 5px;border-radius:3px;">R$${i.preco.toFixed(2)}</span> <button onclick="removerCarrinho(${idx})">X</button></p>`; total+=i.preco; }); div.innerHTML+=`<p><b>Total: <span style="background:#0a84ff;color:white;padding:2px 5px;border-radius:3px;">R$${total.toFixed(2)}</span></b></p>`; }
+function removerCarrinho(i){ carrinho.splice(i,1); atualizarCarrinho(); }
+document.getElementById('finalizar-pedido').onclick=async()=>{ const user=auth.currentUser; if(!user){ mostrarNotificacao('Precisa logar para finalizar'); return; } const pedidoRef=doc(collection(db,'pedidos')); await setDoc(pedidoRef,{usuario:user.uid,itens:carrinho,timestamp:serverTimestamp()}); mostrarNotificacao('Pedido finalizado com sucesso!'); carrinho=[]; atualizarCarrinho(); };
 
-  // Produtos de exemplo
-  const produtos = [
-    {id:1,nome:'Produto 1',desc:'Descrição do produto 1',preco:19.90,img:'https://via.placeholder.com/200x150',avaliacao:4},
-    {id:2,nome:'Produto 2',desc:'Descrição do produto 2',preco:29.90,img:'https://via.placeholder.com/200x150',avaliacao:3},
-  ];
-  const conteudo = document.getElementById('conteudo');
-  function carregarProdutos(){
-    conteudo.innerHTML='';
-    produtos.forEach(p=>{
-      const card = document.createElement('div'); card.className='produto-card';
-      card.dataset.id=p.id;
-      card.innerHTML=`<img src="${p.img}" alt="${p.nome}">
-                      <h3>${p.nome}</h3>
-                      <p>${p.desc}</p>
-                      <p>Preço: <span style="background:#0a84ff;color:white;padding:2px 5px;border-radius:3px;">R$${p.preco.toFixed(2)}</span></p>
-                      <p>Avaliação: ${'★'.repeat(p.avaliacao)+'☆'.repeat(5-p.avaliacao)}</p>
-                      <button class="add-carrinho">Adicionar ao Carrinho</button>`;
-      conteudo.appendChild(card);
-    });
-    document.querySelectorAll('.add-carrinho').forEach(btn=>{
-      btn.onclick=(e)=>{
-        const card=e.target.closest('.produto-card');
-        const id=parseInt(card.dataset.id);
-        adicionarCarrinho(id);
-      }
-    });
-  }
-  carregarProdutos();
+// Painel do dono refatorado
+const painel=document.getElementById('painel-admin');
+document.getElementById('menu-admin-btn').onclick=()=>{ painel.style.display=painel.style.display==='block'?'none':'block'; };
+document.getElementById('salvar-admin-btn').onclick=async()=>{
+  const user=auth.currentUser; if(!user){ mostrarNotificacao('Precisa logar como dono'); return; }
 
-  // Carrinho
-  let carrinho=[];
-  const carrinhoDiv = document.getElementById('carrinho');
-  document.getElementById('menu-carrinho-btn').onclick = ()=>{carrinhoDiv.style.display=carrinhoDiv.style.display==='block'?'none':'block';};
-  function adicionarCarrinho(id){
-    const p=produtos.find(x=>x.id===id);
-    carrinho.push(p); atualizarCarrinho();
-    mostrarNotificacao(`Produto "${p.nome}" adicionado ao carrinho!`, p.nome);
-  }
-  function atualizarCarrinho(){
-    const div=document.getElementById('itens-carrinho'); div.innerHTML='';
-    let total=0; carrinho.forEach((i,idx)=>{
-      div.innerHTML+=`<p>${i.nome} - <span style="background:#ffd700;color:#000;padding:2px 5px;border-radius:3px;">R$${i.preco.toFixed(2)}</span> <button onclick="removerCarrinho(${idx})">X</button></p>`;
-      total+=i.preco;
-    });
-    div.innerHTML+=`<p><b>Total: <span style="background:#0a84ff;color:white;padding:2px 5px;border-radius:3px;">R$${total.toFixed(2)}</span></b></p>`;
-  }
-  function removerCarrinho(i){ carrinho.splice(i,1); atualizarCarrinho(); }
-  document.getElementById('finalizar-pedido').onclick=async()=>{
-    const user=auth.currentUser; if(!user){mostrarNotificacao('Precisa logar para finalizar'); return;}
-    const pedidoRef=doc(collection(db,'pedidos'));
-    await setDoc(pedidoRef,{usuario:user.uid,itens:carrinho,timestamp:serverTimestamp()});
-    mostrarNotificacao('Pedido finalizado com sucesso!');
-    carrinho=[]; atualizarCarrinho();
-  }
+  // Inputs
+  const nome=document.getElementById('nome-empresa').value;
+  const desc=document.getElementById('desc-loja').value;
+  const corFundo=document.getElementById('cor-fundo').value;
+  const corBotoes=document.getElementById('cor-botoes').value;
+  const corTexto=document.getElementById('cor-texto').value;
+  const logoFile=document.getElementById('logo-file').files[0];
+  const fundoFile=document.getElementById('fundo-file').files[0];
+  const layout=document.getElementById('layout-loja').value;
+  const fonte=document.getElementById('fonte-loja').value;
 
-  // Painel do dono
-  const painel=document.getElementById('painel-admin');
-  document.getElementById('menu-admin-btn').onclick = ()=>{ painel.style.display=painel.style.display==='block'?'none':'block'; };
-  document.getElementById('salvar-admin-btn').onclick = async ()=>{
-    const user=auth.currentUser; if(!user){mostrarNotificacao('Precisa logar como dono'); return;}
-    const logoFile=document.getElementById('logo-file').files[0];
-    const fundoFile=document.getElementById('fundo-file').files[0];
-    const nome=document.getElementById('nome-empresa').value;
-    const desc=document.getElementById('desc-loja').value;
-    const corFundo=document.getElementById('cor-fundo').value;
-    const corBotoes=document.getElementById('cor-botoes').value;
-    const corTexto=document.getElementById('cor-texto').value;
-    const layout=document.getElementById('layout-loja').value;
+  let logoUrl='', fundoUrl='';
+  if(logoFile){ const sRef=ref(storage,'logos/'+user.uid+'_'+logoFile.name); await uploadBytes(sRef,logoFile); logoUrl=await getDownloadURL(sRef); document.getElementById('logo').src=logoUrl; }
+  if(fundoFile){ const sRef=ref(storage,'fundos/'+user.uid+'_'+fundoFile.name); await uploadBytes(sRef,fundoFile); fundoUrl=await getDownloadURL(sRef); document.body.style.background=`url(${fundoUrl}) no-repeat center/cover`; }
 
-    let logoUrl='', fundoUrl='';
-    if(logoFile){ const storageRef=ref(storage,'logos/'+user.uid+'_'+logoFile.name); await uploadBytes(storageRef,logoFile); logoUrl=await getDownloadURL(storageRef); document.getElementById('logo').src=logoUrl; }
-    if(fundoFile){ const storageRef=ref(storage,'fundos/'+user.uid+'_'+fundoFile.name); await uploadBytes(storageRef,fundoFile); fundoUrl=await getDownloadURL(storageRef); document.body.style.background=`url(${fundoUrl}) no-repeat center/cover`; }
-
-    await setDoc(doc(db,'admin',user.uid),{nomeEmpresa:nome,descLoja:desc,logo:logoUrl,fundo:fundoUrl,corFundo,corBotoes,corTexto,layout},{merge:true});
-    document.body.style.backgroundColor=corFundo;
-    document.querySelectorAll('button').forEach(btn=>btn.style.backgroundColor=corBotoes);
-    document.querySelectorAll('h1,h2,h3,h4,p,div').forEach(el=>el.style.color=corTexto);
-    document.getElementById('nome-loja-display').innerText=nome;
-    mostrarNotificacao('Alterações salvas com sucesso!');
-  };
+  await setDoc(doc(db,'admin',user.uid),{nomeEmpresa:nome,descLoja:desc,logo:logoUrl,fundo:fundoUrl,corFundo,corBotoes,corTexto,layout,fonte},{merge:true});
+  document.body.style.backgroundColor=corFundo;
+  document.querySelectorAll('button').forEach(btn=>btn.style.backgroundColor=corBotoes);
+  document.querySelectorAll('h1,h2,h3,h4,p,div').forEach(el=>{ el.style.color=corTexto; el.style.fontFamily=fonte; });
+  document.getElementById('nome-loja-display').innerText=nome;
+  mostrarNotificacao('Alterações salvas com sucesso!');
+};
 </script>
 </head>
 <body>
@@ -182,9 +140,7 @@ button:hover { transform: scale(1.05); }
   </ul>
 </nav>
 
-<main id="conteudo">
-  <!-- Produtos carregados via JS -->
-</main>
+<main id="conteudo"></main>
 
 <div id="carrinho">
   <h3>Carrinho</h3>
@@ -194,23 +150,41 @@ button:hover { transform: scale(1.05); }
 
 <div id="painel-admin">
   <h3>Painel do Dono</h3>
-  <input type="text" id="nome-empresa" placeholder="Nome da sua loja">
-  <textarea id="desc-loja" placeholder="Descrição da loja"></textarea>
-  <input type="file" id="logo-file">
-  <input type="file" id="fundo-file">
-  <h4>Personalização de cores</h4>
-  <label>Cor de fundo: <input type="color" id="cor-fundo"></label>
-  <label>Cor dos botões: <input type="color" id="cor-botoes"></label>
-  <label>Cor do texto: <input type="color" id="cor-texto"></label>
-  <h4>Escolha de layout</h4>
-  <select id="layout-loja">
-    <option value="1">Layout 1</option>
-    <option value="2">Layout 2</option>
-    <option value="3">Layout 3</option>
-  </select>
-  <h4>Planos</h4>
-  <p>Básico: grátis (1 layout, 5 produtos, cores e logo padrão)</p>
-  <p>Plus: R$15,99/mês (todos layouts, produtos ilimitados, cores e animações)</p>
+  <div class="admin-section">
+    <label>Nome da loja: <input type="text" id="nome-empresa"></label>
+    <label>Descrição: <textarea id="desc-loja"></textarea></label>
+  </div>
+  <div class="admin-section">
+    <label>Logo: <input type="file" id="logo-file"></label>
+    <label>Fundo: <input type="file" id="fundo-file"></label>
+  </div>
+  <div class="admin-section">
+    <label>Cor de fundo: <input type="color" id="cor-fundo"></label>
+    <label>Cor dos botões: <input type="color" id="cor-botoes"></label>
+    <label>Cor do texto: <input type="color" id="cor-texto"></label>
+    <label>Fonte: 
+      <select id="fonte-loja">
+        <option value="Arial, sans-serif">Arial</option>
+        <option value="'Courier New', monospace">Courier</option>
+        <option value="'Georgia', serif">Georgia</option>
+        <option value="'Verdana', sans-serif">Verdana</option>
+      </select>
+    </label>
+  </div>
+  <div class="admin-section">
+    <label>Layout: 
+      <select id="layout-loja">
+        <option value="1">Layout 1</option>
+        <option value="2">Layout 2</option>
+        <option value="3">Layout 3</option>
+      </select>
+    </label>
+  </div>
+  <div class="admin-section">
+    <h4>Planos</h4>
+    <p>Básico: grátis (1 layout, 5 produtos, cores e logo padrão)</p>
+    <p>Plus: R$15,99/mês (todos layouts, produtos ilimitados, cores e animações)</p>
+  </div>
   <button id="salvar-admin-btn">Salvar Alterações</button>
 </div>
 
