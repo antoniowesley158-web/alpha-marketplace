@@ -23,6 +23,7 @@ button:hover { transform: scale(1.05); background:#0aa; color:#fff;}
 #painel-admin { display:none; background:rgba(0,0,0,0.9); padding:20px; position:fixed; top:10%; left:50%; transform:translateX(-50%); width:90%; max-width:400px; border-radius:10px; box-shadow:0 0 15px #0ff; z-index:2000;}
 #carrinho { display:none; position:fixed; top:10%; right:10px; background:rgba(0,0,0,0.9); padding:15px; border-radius:8px; box-shadow:0 0 10px #0ff; max-width:300px; z-index:1500; }
 #notificacao { position: fixed; top:20px; left:50%; transform:translateX(-50%); background: rgba(0,0,0,0.85); color:#0ff; padding:15px 25px; border-radius:12px; font-weight:bold; font-size:16px; text-align:center; box-shadow:0 0 15px #0ff; z-index:9999; display:none; animation: slideIn 0.5s ease forwards;}
+#voltar { position: fixed; top:20px; left:20px; cursor:pointer; font-size:20px; color:#0ff; font-weight:bold; z-index:9999;}
 @keyframes slideIn { 0%{opacity:0; transform: translateY(-30px);} 100%{opacity:1; transform: translateY(0);} }
 </style>
 <script type="module">
@@ -116,6 +117,9 @@ document.addEventListener('DOMContentLoaded',()=>{
   }
   window.removerCarrinho = i=>{ carrinho.splice(i,1); atualizarCarrinho(); }
 
+  // Setinha voltar
+  document.getElementById('voltar').onclick = ()=>{ window.history.back(); }
+
   // Painel do dono
   const painel=document.getElementById('painel-admin');
   document.getElementById('menu-admin-btn').onclick = ()=>{ painel.style.display=painel.style.display==='block'?'none':'block'; };
@@ -123,6 +127,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 </script>
 </head>
 <body>
+<div id="voltar">← Voltar</div>
 <header>
   <div id="logo-container"><img id="logo" src="default-logo.png" alt="Logo" width="50"></div>
   <div id="nome-loja-display">Alpha Marketplace</div>
