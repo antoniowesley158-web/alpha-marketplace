@@ -20,8 +20,8 @@ header { display:flex; justify-content:space-between; align-items:center; paddin
 button { padding:10px 20px; border:none; cursor:pointer; transition: transform 0.2s; margin-top:5px; border-radius:5px; }
 button:hover { transform: scale(1.05); }
 #painel-admin { display:none; background:#eee; padding:20px; position:fixed; top:10%; left:50%; transform:translateX(-50%); width:90%; max-width:400px; border-radius:10px; box-shadow:0 4px 10px rgba(0,0,0,0.3); z-index:1000; }
-#painel-admin input, #painel-admin textarea, #painel-admin select { width:100%; margin-bottom:10px; padding:8px; }
 #carrinho { display:none; position:fixed; top:10%; right:10px; background:white; padding:15px; border-radius:8px; box-shadow:0 4px 10px rgba(0,0,0,0.3); max-width:300px; z-index:999; }
+#login-btn { margin-right:10px; padding:5px 10px; background:#0a84ff; color:white; border:none; border-radius:5px; cursor:pointer; }
 </style>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js"></script>
@@ -33,7 +33,11 @@ button:hover { transform: scale(1.05); }
 <header>
   <div id="logo-container"><img id="logo" src="default-logo.png" alt="Logo" width="50"></div>
   <div id="nome-loja-display">Sua Loja</div>
-  <div id="menu-hamburguer">☰</div>
+  <div>
+    <button id="login-btn">Login com Google</button>
+    <span id="usuario-logado"></span>
+    <div id="menu-hamburguer">☰</div>
+  </div>
 </header>
 
 <nav id="menu-lateral">
@@ -46,23 +50,7 @@ button:hover { transform: scale(1.05); }
 </nav>
 
 <main id="conteudo">
-  <!-- Produtos de exemplo -->
-  <div class="produto-card" data-id="1">
-    <img src="https://via.placeholder.com/200x150" alt="Produto 1">
-    <h3>Produto 1</h3>
-    <p>Descrição do produto 1</p>
-    <p>Preço: R$19,90</p>
-    <p>Avaliação: ★★★★☆</p>
-    <button class="add-carrinho">Adicionar ao Carrinho</button>
-  </div>
-  <div class="produto-card" data-id="2">
-    <img src="https://via.placeholder.com/200x150" alt="Produto 2">
-    <h3>Produto 2</h3>
-    <p>Descrição do produto 2</p>
-    <p>Preço: R$29,90</p>
-    <p>Avaliação: ★★★☆☆</p>
-    <button class="add-carrinho">Adicionar ao Carrinho</button>
-  </div>
+  <!-- Produtos carregados via JS -->
 </main>
 
 <div id="carrinho">
@@ -71,30 +59,25 @@ button:hover { transform: scale(1.05); }
   <button id="finalizar-pedido">Finalizar Pedido</button>
 </div>
 
-<!-- Painel do Dono -->
 <div id="painel-admin">
   <h3>Painel do Dono</h3>
   <input type="text" id="nome-empresa" placeholder="Nome da sua loja">
   <textarea id="desc-loja" placeholder="Descrição da loja"></textarea>
   <input type="file" id="logo-file">
   <input type="file" id="fundo-file">
-
   <h4>Personalização de cores</h4>
   <label>Cor de fundo: <input type="color" id="cor-fundo"></label>
   <label>Cor dos botões: <input type="color" id="cor-botoes"></label>
   <label>Cor do texto: <input type="color" id="cor-texto"></label>
-
   <h4>Escolha de layout</h4>
   <select id="layout-loja">
     <option value="1">Layout 1</option>
     <option value="2">Layout 2</option>
     <option value="3">Layout 3</option>
   </select>
-
   <h4>Planos</h4>
   <p>Básico: grátis (1 layout, 5 produtos, cores e logo padrão)</p>
   <p>Plus: R$15,99/mês (todos layouts, produtos ilimitados, cores e animações)</p>
-
   <button id="salvar-admin-btn">Salvar Alterações</button>
 </div>
 
@@ -117,60 +100,94 @@ const storage = firebase.storage();
 const menu = document.getElementById('menu-lateral');
 document.getElementById('menu-hamburguer').onclick = () => menu.classList.toggle('aberto');
 
-// Mostrar carrinho
+// Login Google
+const loginBtn = document.getElementById('login-btn');
+const usuarioSpan = document.getElementById('usuario-logado');
+loginBtn.onclick = async () => {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  try { await auth.signInWithPopup(provider); } 
+  catch(e){ alert('Erro no login'); }
+}
+auth.onAuthStateChanged(user => {
+  if(user){ usuarioSpan.innerText = user.displayName; loginBtn.style.display='none'; } 
+  else { usuarioSpan.innerText=''; loginBtn.style.display='inline-block'; }
+});
+
+// Produtos de exemplo
+const produtos = [
+  {id:1,nome:'Produto 1',desc:'Descrição do produto 1',preco:19.90,img:'https://via.placeholder.com/200x150',avaliacao:4},
+  {id:2,nome:'Produto 2',desc:'Descrição do produto 2',preco:29.90,img:'https://via.placeholder.com/200x150',avaliacao:3},
+];
+const conteudo = document.getElementById('conteudo');
+function carregarProdutos(){
+  conteudo.innerHTML='';
+  produtos.forEach(p=>{
+    const card = document.createElement('div'); card.className='produto-card';
+    card.dataset.id=p.id;
+    card.innerHTML=`<img src="${p.img}" alt="${p.nome}"><h3>${p.nome}</h3><p>${p.desc}</p><p>Preço: R$${p.preco.toFixed(2)}</p><p>Avaliação: ${'★'.repeat(p.avaliacao)+'☆'.repeat(5-p.avaliacao)}</p><button class="add-carrinho">Adicionar ao Carrinho</button>`;
+    conteudo.appendChild(card);
+  });
+  document.querySelectorAll('.add-carrinho').forEach(btn=>{
+    btn.onclick=(e)=>{
+      const card=e.target.closest('.produto-card');
+      const id=parseInt(card.dataset.id);
+      adicionarCarrinho(id);
+    }
+  });
+}
+carregarProdutos();
+
+// Carrinho
+let carrinho=[];
 const carrinhoDiv = document.getElementById('carrinho');
-document.getElementById('menu-carrinho-btn').onclick = () => {
-  carrinhoDiv.style.display = carrinhoDiv.style.display==='block'?'none':'block';
+document.getElementById('menu-carrinho-btn').onclick = ()=>{carrinhoDiv.style.display=carrinhoDiv.style.display==='block'?'none':'block';};
+function adicionarCarrinho(id){
+  const p=produtos.find(x=>x.id===id);
+  carrinho.push(p); atualizarCarrinho();
+}
+function atualizarCarrinho(){
+  const div=document.getElementById('itens-carrinho'); div.innerHTML='';
+  let total=0; carrinho.forEach((i,idx)=>{
+    div.innerHTML+=`<p>${i.nome} - R$${i.preco.toFixed(2)} <button onclick="removerCarrinho(${idx})">X</button></p>`;
+    total+=i.preco;
+  });
+  div.innerHTML+=`<p><b>Total: R$${total.toFixed(2)}</b></p>`;
+}
+function removerCarrinho(i){ carrinho.splice(i,1); atualizarCarrinho(); }
+document.getElementById('finalizar-pedido').onclick=async()=>{
+  const user=auth.currentUser; if(!user){alert('Precisa logar para finalizar'); return;}
+  const pedidoRef=db.collection('pedidos').doc();
+  await pedidoRef.set({usuario:user.uid,itens:carrinho,timestamp:firebase.firestore.FieldValue.serverTimestamp()});
+  alert('Pedido finalizado!');
+  carrinho=[]; atualizarCarrinho();
 }
 
 // Painel do dono
-const painel = document.getElementById('painel-admin');
-document.getElementById('menu-admin-btn').onclick = () => painel.style.display = painel.style.display==='block'?'none':'block';
+const painel=document.getElementById('painel-admin');
+document.getElementById('menu-admin-btn').onclick = ()=>{ painel.style.display=painel.style.display==='block'?'none':'block'; };
+document.getElementById('salvar-admin-btn').onclick = async ()=>{
+  const user=auth.currentUser; if(!user){alert('Precisa logar como dono'); return;}
+  const logoFile=document.getElementById('logo-file').files[0];
+  const fundoFile=document.getElementById('fundo-file').files[0];
+  const nome=document.getElementById('nome-empresa').value;
+  const desc=document.getElementById('desc-loja').value;
+  const corFundo=document.getElementById('cor-fundo').value;
+  const corBotoes=document.getElementById('cor-botoes').value;
+  const corTexto=document.getElementById('cor-texto').value;
+  const layout=document.getElementById('layout-loja').value;
 
-// Carrinho
-let carrinho = [];
-document.querySelectorAll('.add-carrinho').forEach(btn => {
-  btn.onclick = (e) => {
-    const card = e.target.closest('.produto-card');
-    const nome = card.querySelector('h3').innerText;
-    const preco = card.querySelector('p:nth-of-type(2)').innerText.replace('Preço: R$', '');
-    carrinho.push({nome, preco});
-    atualizarCarrinho();
-  }
-});
-function atualizarCarrinho(){
-  const div = document.getElementById('itens-carrinho');
-  div.innerHTML = '';
-  let total = 0;
-  carrinho.forEach((item, i)=>{
-    div.innerHTML += `<p>${item.nome} - R$${item.preco} <button onclick="removerCarrinho(${i})">X</button></p>`;
-    total += parseFloat(item.preco);
-  });
-  div.innerHTML += `<p><b>Total: R$${total.toFixed(2)}</b></p>`;
-}
-function removerCarrinho(i){ carrinho.splice(i,1); atualizarCarrinho(); }
-document.getElementById('finalizar-pedido').onclick = () => { alert('Pedido finalizado!'); carrinho=[]; atualizarCarrinho(); }
+  let logoUrl='', fundoUrl='';
+  if(logoFile){ const ref=storage.ref('logos/'+user.uid+'_'+logoFile.name); await ref.put(logoFile); logoUrl=await ref.getDownloadURL(); document.getElementById('logo').src=logoUrl; }
+  if(fundoFile){ const ref=storage.ref('fundos/'+user.uid+'_'+fundoFile.name); await ref.put(fundoFile); fundoUrl=await ref.getDownloadURL(); document.body.style.background=`url(${fundoUrl}) no-repeat center/cover`; }
 
-// Painel do dono salvar alterações
-document.getElementById('salvar-admin-btn').onclick = async () => {
-  const user = {uid:'admin'}; // mock admin
-  const logoFile = document.getElementById('logo-file').files[0];
-  const fundoFile = document.getElementById('fundo-file').files[0];
-  const nome = document.getElementById('nome-empresa').value;
-  const desc = document.getElementById('desc-loja').value;
-  const corFundo = document.getElementById('cor-fundo').value;
-  const corBotoes = document.getElementById('cor-botoes').value;
-  const corTexto = document.getElementById('cor-texto').value;
-  const layout = document.getElementById('layout-loja').value;
-
-  // Aqui você integraria Firebase Storage para logo/fundo
-  if(nome) document.getElementById('nome-loja-display').innerText = nome;
-  document.body.style.backgroundColor = corFundo;
+  await db.collection('admin').doc(user.uid).set({nomeEmpresa:nome,descLoja:desc,logo:logoUrl,fundo:fundoUrl,corFundo,corBotoes,corTexto,layout},{merge:true});
+  document.body.style.backgroundColor=corFundo;
   document.querySelectorAll('button').forEach(btn=>btn.style.backgroundColor=corBotoes);
   document.querySelectorAll('h1,h2,h3,h4,p,div').forEach(el=>el.style.color=corTexto);
-
+  document.getElementById('nome-loja-display').innerText=nome;
   alert('Alterações salvas!');
 };
 </script>
+
 </body>
 </html>
