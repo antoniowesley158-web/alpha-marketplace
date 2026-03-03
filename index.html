@@ -9,11 +9,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
 
 <style>
-/* Reset e corpo */
 body { margin:0; font-family:'Roboto', sans-serif; background:#0a0a0a; color:#fff; overflow-x:hidden; transition: background 0.3s; }
 h1,h2,h3,h4,h5,h6 { font-family:'Orbitron', sans-serif; color:#0ff; text-shadow:0 0 8px #0ff; }
 
-/* Fundo animado de partículas */
+/* Fundo animado */
 #fundo-animado { position:fixed; top:0; left:0; width:100%; height:100%; z-index:-1; background:linear-gradient(120deg,#0a0a0a,#111); overflow:hidden; }
 .particula { position:absolute; border-radius:50%; background:#0ff; opacity:0.5; }
 
@@ -24,7 +23,7 @@ header { display:flex; justify-content:space-between; align-items:center; paddin
 .menu-btn { background:transparent; border:2px solid #0ff; color:#0ff; padding:10px 20px; border-radius:6px; cursor:pointer; transition:0.3s; text-transform:uppercase; font-weight:500; }
 .menu-btn:hover { background:#0ff; color:#000; box-shadow:0 0 12px #0ff, 0 0 20px #0ff inset; }
 
-/* Menu lateral animado */
+/* Menu lateral */
 #menu-lateral { position:fixed; top:0; left:-250px; width:250px; height:100%; background:rgba(0,0,0,0.9); backdrop-filter:blur(6px); color:#0ff; transition:0.4s; z-index:101; padding:20px; }
 #menu-lateral.aberto { left:0; }
 #menu-lateral ul { list-style:none; padding:0; margin:0; }
@@ -35,28 +34,33 @@ header { display:flex; justify-content:space-between; align-items:center; paddin
 #voltar { font-size:1.5em; cursor:pointer; margin-bottom:20px; display:inline-block; transition:0.3s; }
 #voltar:hover { transform:translateX(-5px); }
 
-/* Seções da loja */
-section { padding:80px 20px; max-width:1000px; margin:0 auto; }
-.produto-card { background:rgba(20,20,20,0.8); padding:15px; border-radius:10px; box-shadow:0 0 15px #0ff; margin:15px; display:inline-block; vertical-align:top; width:200px; text-align:center; transition:0.3s; }
-.produto-card img { width:100%; border-radius:8px; }
-.produto-card:hover { transform:scale(1.05); }
-
-/* Avaliações */
-.feedback { background:rgba(20,20,20,0.8); padding:15px; border-radius:10px; box-shadow:0 0 15px #0ff; margin-bottom:15px; }
-
-/* Avisos animados */
-#aviso { position:fixed; top:20px; right:20px; background:#0ff; color:#000; padding:15px 25px; border-radius:8px; display:none; animation:fadeInOut 2.5s ease forwards; font-weight:bold; z-index:999; }
-@keyframes fadeInOut { 0%{opacity:0; transform:translateY(-20px);} 10%,90%{opacity:1; transform:translateY(0);} 100%{opacity:0; transform:translateY(-20px);} }
-
 /* Banner inicial */
 .hero { text-align:center; padding:150px 20px; }
 .hero h1 { font-size:3em; }
 .hero p { font-size:1.2em; margin:15px 0; }
+
+/* Seções */
+section { padding:80px 20px; max-width:1000px; margin:0 auto; }
+
+/* Produtos */
+.produto-card { background:rgba(20,20,20,0.8); padding:15px; border-radius:10px; box-shadow:0 0 15px #0ff; margin:15px; display:inline-block; vertical-align:top; width:200px; text-align:center; transition:0.3s; }
+.produto-card img { width:100%; border-radius:8px; }
+.produto-card:hover { transform:scale(1.05); }
+
+/* Feedbacks */
+.feedback { background:rgba(20,20,20,0.8); padding:15px; border-radius:10px; box-shadow:0 0 15px #0ff; margin-bottom:15px; }
+
+/* Textareas/inputs bonitinhos */
+textarea, input { width:100%; padding:10px; border-radius:8px; border:2px solid #0ff; background:rgba(20,20,20,0.9); color:#fff; margin-bottom:10px; box-shadow:0 0 8px #0ff inset; font-family:'Roboto', sans-serif; transition:0.3s; }
+textarea:focus, input:focus { outline:none; border-color:#0ff; box-shadow:0 0 12px #0ff inset; }
+
+/* Avisos animados */
+#aviso { position:fixed; top:20px; right:20px; background:#0ff; color:#000; padding:15px 25px; border-radius:8px; display:none; animation:fadeInOut 2.5s ease forwards; font-weight:bold; z-index:999; }
+@keyframes fadeInOut { 0%{opacity:0; transform:translateY(-20px);} 10%,90%{opacity:1; transform:translateY(0);} 100%{opacity:0; transform:translateY(-20px);} }
 </style>
 </head>
 
 <body>
-
 <div id="fundo-animado"></div>
 
 <header>
@@ -66,30 +70,27 @@ section { padding:80px 20px; max-width:1000px; margin:0 auto; }
   </div>
 </header>
 
-<!-- Menu lateral -->
 <nav id="menu-lateral">
   <span id="voltar">← Voltar</span>
   <ul>
     <li data-secao="produtos">Produtos</li>
     <li data-secao="avaliacoes">Avaliações</li>
     <li data-secao="sobre">Sobre a Loja</li>
+    <li data-secao="admin">Admin (Somente Você)</li>
   </ul>
 </nav>
 
-<!-- Banner inicial -->
 <div class="hero">
   <h1>Alpha Marketplace</h1>
   <p>Sua loja gamer com estilo profissional!</p>
 </div>
 
-<!-- Seção Produtos -->
 <section id="produtos">
   <h2>Produtos</h2>
   <div id="lista-produtos"></div>
   <button id="adicionar-produto">Adicionar Produto</button>
 </section>
 
-<!-- Seção Avaliações -->
 <section id="avaliacoes">
   <h2>Avaliações / Feedbacks</h2>
   <div id="lista-feedbacks"></div>
@@ -97,20 +98,25 @@ section { padding:80px 20px; max-width:1000px; margin:0 auto; }
   <button id="enviar-feedback">Enviar Feedback</button>
 </section>
 
-<!-- Seção Sobre a loja -->
 <section id="sobre">
   <h2>Sobre a Loja</h2>
   <textarea id="descricao-loja" placeholder="Descrição da loja"></textarea>
   <button id="salvar-descricao">Salvar Descrição</button>
 </section>
 
-<!-- Aviso animado -->
+<section id="admin" style="display:none;">
+  <h2>Painel Admin</h2>
+  <input type="text" id="admin-nome" placeholder="Nome da Loja">
+  <textarea id="admin-desc" placeholder="Descrição da Loja"></textarea>
+  <input type="number" id="admin-estoque" placeholder="Estoque Total">
+  <button id="salvar-admin">Salvar Alterações</button>
+</section>
+
 <div id="aviso"></div>
 
-<!-- Firebase -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+import { getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAkooYQtwZa3ijKAu8Zl8iNV3vedf3oplI",
@@ -129,15 +135,16 @@ const menu = document.getElementById('menu-lateral');
 document.getElementById('abrir-menu').onclick = ()=> menu.classList.toggle('aberto');
 document.getElementById('voltar').onclick = ()=> menu.classList.remove('aberto');
 
-// Troca de seção pelo menu
+// Troca de seção
 document.querySelectorAll('#menu-lateral li').forEach(li=>{
   li.onclick = ()=>{
-    document.getElementById(li.dataset.secao).scrollIntoView({behavior:'smooth'});
+    const secao = document.getElementById(li.dataset.secao);
+    if(secao) secao.scrollIntoView({behavior:'smooth'});
     menu.classList.remove('aberto');
   }
 });
 
-// Fundo animado simples
+// Fundo animado
 const fundo = document.getElementById('fundo-animado');
 for(let i=0;i<50;i++){
   const p = document.createElement('div'); p.className='particula';
@@ -147,7 +154,7 @@ for(let i=0;i<50;i++){
   fundo.appendChild(p);
 }
 
-// Avisos animados
+// Avisos
 function mostrarAviso(msg){
   const aviso = document.getElementById('aviso');
   aviso.innerText = msg;
@@ -162,12 +169,13 @@ document.getElementById('adicionar-produto').onclick = ()=>{
   const nome = prompt("Nome do produto:");
   const preco = prompt("Preço do produto:");
   const img = prompt("URL da imagem:");
-  if(nome && preco){
-    const p = {nome, preco, img};
+  const estoque = prompt("Quantidade em estoque:");
+  if(nome && preco && estoque){
+    const p = {nome, preco, img, estoque:Number(estoque)};
     produtos.push(p);
     const div = document.createElement('div');
     div.className='produto-card';
-    div.innerHTML = `<img src="${img}" alt="${nome}"><h3>${nome}</h3><p>Preço: R$${preco}</p>`;
+    div.innerHTML = `<img src="${img}" alt="${nome}"><h3>${nome}</h3><p>Preço: R$${preco}</p><p>Estoque: ${estoque}</p>`;
     listaProdutos.appendChild(div);
   }
 }
@@ -190,6 +198,25 @@ document.getElementById('enviar-feedback').onclick = ()=>{
 document.getElementById('salvar-descricao').onclick = ()=>{
   const desc = document.getElementById('descricao-loja').value;
   mostrarAviso('Descrição da loja salva!');
+}
+
+// Admin (simples)
+const senhaAdmin = "1234"; // sua senha
+document.querySelector('#menu-lateral li[data-secao="admin"]').onclick = ()=>{
+  const input = prompt("Digite a senha do admin:");
+  if(input===senhaAdmin){
+    document.getElementById('admin').style.display='block';
+    mostrarAviso('Bem-vindo, Admin!');
+  } else {
+    mostrarAviso('Senha incorreta');
+  }
+}
+
+document.getElementById('salvar-admin').onclick = ()=>{
+  const nome = document.getElementById('admin-nome').value;
+  const desc = document.getElementById('admin-desc').value;
+  const estoque = document.getElementById('admin-estoque').value;
+  mostrarAviso('Alterações salvas!');
 }
 </script>
 
