@@ -22,4 +22,127 @@ button:hover { transform: scale(1.05); background:#0aa; color:#fff; }
 #painel-admin { display:none; background:rgba(0,0,0,0.9); padding:20px; position:fixed; top:10%; left:50%; transform:translateX(-50%); width:90%; max-width:400px; border-radius:10px; box-shadow:0 0 15px #0ff; z-index:2000; }
 #carrinho { display:none; position:fixed; top:10%; right:10px; background:rgba(0,0,0,0.9); padding:15px; border-radius:8px; box-shadow:0 0 10px #0ff; max-width:300px; z-index:1500; }
 #login-btn { margin-right:10px; padding:5px 10px; background:#0a84ff; color:white; border:none; border-radius:5px; cursor:pointer; }
-#notificacao { position: fixed; top: 20
+#notificacao { position: fixed; top: 20px; right: 20px; background: rgba(0,0,0,0.8); color: #fff; padding: 15px 20px; border-radius: 10px; font-weight: bold; font-family: 'Arial', sans-serif; box-shadow: 0 0 10px #0ff; z-index: 9999; display: none; animation: slideIn 0.5s ease forwards; }
+@keyframes slideIn { 0% { opacity: 0; transform: translateX(100px); } 100% { opacity: 1; transform: translateX(0); } }
+</style>
+<script type="module">
+  // Firebase modular import
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+  import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
+  import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAkooYQtwZa3ijKAu8Zl8iNV3vedf3oplI",
+    authDomain: "alpha-marketplace-a5bee.firebaseapp.com",
+    projectId: "alpha-marketplace-a5bee",
+    storageBucket: "alpha-marketplace-a5bee.firebasestorage.app",
+    messagingSenderId: "633576067411",
+    appId: "1:633576067411:web:f837cc956a21d02954d1a6"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  // Notificação
+  function mostrarAviso(msg) {
+    const div = document.getElementById('notificacao');
+    div.innerText = msg;
+    div.style.display = 'block';
+    setTimeout(() => { div.style.display = 'none'; }, 3000);
+  }
+
+  // Menu hamburguer
+  document.addEventListener('DOMContentLoaded', () => {
+    const menu = document.getElementById('menu-lateral');
+    document.getElementById('menu-hamburguer').onclick = () => menu.classList.toggle('aberto');
+
+    const loginBtn = document.getElementById('login-btn');
+    const usuarioSpan = document.getElementById('usuario-logado');
+
+    loginBtn.onclick = async () => {
+      const provider = new GoogleAuthProvider();
+      try {
+        const result = await signInWithPopup(auth, provider);
+        const user = result.user;
+        usuarioSpan.innerText = user.displayName;
+        loginBtn.style.display = 'none';
+        mostrarAviso(`Bem-vindo, ${user.displayName}!`);
+      } catch (e) {
+        mostrarAviso('Erro no login');
+      }
+    };
+
+    onAuthStateChanged(auth, user => {
+      if(user) {
+        usuarioSpan.innerText = user.displayName;
+        loginBtn.style.display = 'none';
+      } else {
+        usuarioSpan.innerText = '';
+        loginBtn.style.display = 'inline-block';
+      }
+    });
+
+    // Criar Loja
+    const criarLojaBtn = document.getElementById('criar-loja-btn');
+    criarLojaBtn.onclick = async () => {
+      const nomeLoja = document.getElementById('nome-loja').value;
+      const descLoja = document.getElementById('desc-loja').value;
+      const user = auth.currentUser;
+      if(!user){ mostrarAviso('Faça login primeiro!'); return; }
+      if(!nomeLoja){ mostrarAviso('Digite o nome da loja!'); return; }
+      try {
+        await addDoc(collection(db,'lojas'),{
+          uid: user.uid,
+          nome: nomeLoja,
+          descricao: descLoja,
+          timestamp: serverTimestamp()
+        });
+        mostrarAviso('Loja criada com sucesso!');
+        document.getElementById('nome-loja').value='';
+        document.getElementById('desc-loja').value='';
+      } catch(e){ mostrarAviso('Erro ao criar loja'); }
+    };
+  });
+</script>
+</head>
+<body>
+<header>
+  <div id="logo-container"><img id="logo" src="default-logo.png" alt="Logo" width="50"></div>
+  <div id="nome-loja-display">Alpha Marketplace</div>
+  <div>
+    <button id="login-btn">Login com Google</button>
+    <span id="usuario-logado"></span>
+    <div id="menu-hamburguer">☰</div>
+  </div>
+</header>
+
+<nav id="menu-lateral">
+  <ul>
+    <li id="menu-produtos">Produtos</li>
+    <li id="menu-carrinho-btn">Carrinho</li>
+    <li id="menu-admin-btn">Painel do Dono</li>
+  </ul>
+</nav>
+
+<main id="conteudo">
+  <h2>Bem-vindo ao Alpha Marketplace!</h2>
+  <p>Crie sua loja e venda seus produtos.</p>
+  <input type="text" id="nome-loja" placeholder="Nome da sua loja">
+  <textarea id="desc-loja" placeholder="Descrição da loja"></textarea>
+  <button id="criar-loja-btn">Criar Loja</button>
+</main>
+
+<div id="carrinho">
+  <h3>Carrinho</h3>
+  <div id="itens-carrinho"></div>
+</div>
+
+<div id="painel-admin">
+  <h3>Painel do Dono</h3>
+  <p>Ainda em construção...</p>
+</div>
+
+<div id="notificacao"></div>
+</body>
+</html>
