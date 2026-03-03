@@ -72,21 +72,53 @@ document.addEventListener('DOMContentLoaded',()=>{
     else{ usuarioSpan.innerText=''; loginBtn.style.display='inline-block'; }
   });
 
-  // Criar Loja
-  const criarLojaBtn = document.getElementById('criar-loja-btn');
-  criarLojaBtn.onclick = async ()=>{
-    const nomeLoja=document.getElementById('nome-loja').value;
-    const descLoja=document.getElementById('desc-loja').value;
-    const user=auth.currentUser;
-    if(!user){ mostrarAviso('Faça login primeiro!'); return;}
-    if(!nomeLoja){ mostrarAviso('Digite o nome da loja!'); return;}
-    try{
-      await addDoc(collection(db,'lojas'),{uid:user.uid,nome:nomeLoja,descricao:descLoja,timestamp:serverTimestamp()});
-      mostrarAviso('Loja criada com sucesso!');
-      document.getElementById('nome-loja').value='';
-      document.getElementById('desc-loja').value='';
-    }catch(e){mostrarAviso('Erro ao criar loja');}
-  };
+  // Produtos de exemplo
+  const produtos = [
+    {id:1,nome:'Produto 1',desc:'Descrição do produto 1',preco:19.90,img:'https://via.placeholder.com/200x150',avaliacao:4},
+    {id:2,nome:'Produto 2',desc:'Descrição do produto 2',preco:29.90,img:'https://via.placeholder.com/200x150',avaliacao:3},
+  ];
+  const conteudo = document.getElementById('conteudo');
+
+  function carregarProdutos(){
+    conteudo.innerHTML='';
+    produtos.forEach(p=>{
+      const card = document.createElement('div'); card.className='produto-card';
+      card.dataset.id=p.id;
+      card.innerHTML=`<img src="${p.img}" alt="${p.nome}"><h3>${p.nome}</h3><p>${p.desc}</p><p>Preço: R$${p.preco.toFixed(2)}</p><p>Avaliação: ${'★'.repeat(p.avaliacao)+'☆'.repeat(5-p.avaliacao)}</p><button class="add-carrinho">Adicionar ao Carrinho</button>`;
+      conteudo.appendChild(card);
+    });
+    document.querySelectorAll('.add-carrinho').forEach(btn=>{
+      btn.onclick=(e)=>{
+        const card=e.target.closest('.produto-card');
+        const id=parseInt(card.dataset.id);
+        adicionarCarrinho(id);
+      }
+    });
+  }
+  carregarProdutos();
+
+  // Carrinho
+  let carrinho=[];
+  const carrinhoDiv = document.getElementById('carrinho');
+  document.getElementById('menu-carrinho-btn').onclick = ()=>{carrinhoDiv.style.display=carrinhoDiv.style.display==='block'?'none':'block';};
+  function adicionarCarrinho(id){
+    const p=produtos.find(x=>x.id===id);
+    carrinho.push(p); atualizarCarrinho();
+    mostrarAviso(`${p.nome} adicionado ao carrinho!`);
+  }
+  function atualizarCarrinho(){
+    const div=document.getElementById('itens-carrinho'); div.innerHTML='';
+    let total=0; carrinho.forEach((i,idx)=>{
+      div.innerHTML+=`<p>${i.nome} - R$${i.preco.toFixed(2)} <button onclick="removerCarrinho(${idx})">X</button></p>`;
+      total+=i.preco;
+    });
+    div.innerHTML+=`<p><b>Total: R$${total.toFixed(2)}</b></p>`;
+  }
+  window.removerCarrinho = i=>{ carrinho.splice(i,1); atualizarCarrinho(); }
+
+  // Painel do dono
+  const painel=document.getElementById('painel-admin');
+  document.getElementById('menu-admin-btn').onclick = ()=>{ painel.style.display=painel.style.display==='block'?'none':'block'; };
 });
 </script>
 </head>
@@ -112,9 +144,6 @@ document.addEventListener('DOMContentLoaded',()=>{
 <main id="conteudo">
   <h2>Bem-vindo ao Alpha Marketplace!</h2>
   <p>Crie sua loja e venda seus produtos.</p>
-  <input type="text" id="nome-loja" placeholder="Nome da sua loja">
-  <textarea id="desc-loja" placeholder="Descrição da loja"></textarea>
-  <button id="criar-loja-btn">Criar Loja</button>
 </main>
 
 <div id="carrinho">
@@ -124,7 +153,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 
 <div id="painel-admin">
   <h3>Painel do Dono</h3>
-  <p>Ainda em construção...</p>
+  <p>Controle sua loja aqui (em breve completo)</p>
 </div>
 
 <div id="notificacao"></div>
