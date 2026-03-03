@@ -5,25 +5,24 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Alpha Marketplace</title>
 <style>
-body { font-family: Arial; margin:0; transition: background 0.3s; background:#f2f2f2; }
+body { font-family: Arial, sans-serif; margin:0; transition: background 0.3s; background:#f2f2f2; }
 header { display:flex; justify-content:space-between; align-items:center; padding:10px; background:#333; color:white; }
 #menu-hamburguer { cursor:pointer; font-size:24px; }
-#menu-lateral { position:fixed; left:-250px; top:0; width:250px; height:100%; background:#222; color:white; transition: left 0.3s; overflow:auto; }
+#menu-lateral { position:fixed; left:-250px; top:0; width:250px; height:100%; background:#222; color:white; transition: left 0.3s; overflow:auto; z-index:999; }
 #menu-lateral.aberto { left:0; }
-#menu-lateral ul { list-style:none; padding:20px; }
+#menu-lateral ul { list-style:none; padding:20px; margin:0; }
 #menu-lateral li { padding:10px 0; cursor:pointer; transition: background 0.2s; }
 #menu-lateral li:hover { background:#444; }
-#conteudo { padding:20px; display:flex; flex-wrap:wrap; gap:20px; }
-.produto-card { background:white; padding:10px; width:200px; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.2); transition: transform 0.2s; }
-.produto-card:hover { transform: scale(1.05); }
+#conteudo { padding:20px; display:flex; flex-wrap:wrap; gap:20px; justify-content:center; }
+.produto-card { background:white; padding:10px; width:200px; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.2); transition: transform 0.3s, box-shadow 0.3s; position:relative; }
+.produto-card:hover { transform: scale(1.05); box-shadow:0 4px 12px rgba(0,0,0,0.3); }
 .produto-card img { width:100%; border-radius:6px; }
-button { padding:10px 20px; border:none; cursor:pointer; transition: transform 0.2s; margin-top:5px; border-radius:5px; }
+button { padding:10px 20px; border:none; cursor:pointer; transition: transform 0.2s; margin-top:5px; border-radius:5px; background:#0a84ff; color:white; }
 button:hover { transform: scale(1.05); }
-#painel-admin { display:none; background:#eee; padding:20px; position:fixed; top:10%; left:50%; transform:translateX(-50%); width:90%; max-width:400px; border-radius:10px; box-shadow:0 4px 10px rgba(0,0,0,0.3); z-index:1000; }
+#painel-admin { display:none; background:#eee; padding:20px; position:fixed; top:10%; left:50%; transform:translateX(-50%); width:90%; max-width:400px; border-radius:10px; box-shadow:0 4px 10px rgba(0,0,0,0.3); z-index:1000; overflow:auto; max-height:80%; }
 #carrinho { display:none; position:fixed; top:10%; right:10px; background:white; padding:15px; border-radius:8px; box-shadow:0 4px 10px rgba(0,0,0,0.3); max-width:300px; z-index:999; }
-#login-btn { margin-right:10px; padding:5px 10px; background:#0a84ff; color:white; border:none; border-radius:5px; cursor:pointer; }
-#notificacao { position:fixed; top:20px; right:20px; background:#0a84ff; color:white; padding:10px 15px; border-radius:5px; display:none; animation:fadein 0.5s; }
-@keyframes fadein { from {opacity:0; transform:translateY(-10px);} to {opacity:1; transform:translateY(0);} }
+#login-btn { margin-right:10px; padding:5px 10px; border:none; border-radius:5px; cursor:pointer; background:#0a84ff; color:white; }
+#notificacao { position:fixed; top:20px; right:20px; background:#0a84ff; color:white; padding:10px 20px; border-radius:8px; opacity:0; transform:translateY(-20px); transition: opacity 0.5s, transform 0.5s; z-index:1001; }
 </style>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js"></script>
@@ -32,8 +31,8 @@ button:hover { transform: scale(1.05); }
 <body>
 
 <header>
-  <div id="logo-container"><img id="logo" src="https://via.placeholder.com/50" alt="Logo" width="50"></div>
-  <div id="nome-loja-display">Sua Loja</div>
+  <div id="logo-container"><img id="logo" src="https://via.placeholder.com/50x50?text=Logo" alt="Logo" width="50"></div>
+  <div id="nome-loja-display" style="background:#fff;padding:2px 6px;border-radius:4px;color:#333;">Sua Loja</div>
   <div>
     <button id="login-btn">Login com Google</button>
     <span id="usuario-logado"></span>
@@ -50,7 +49,9 @@ button:hover { transform: scale(1.05); }
   </ul>
 </nav>
 
-<main id="conteudo"></main>
+<main id="conteudo">
+  <!-- Produtos carregados via JS -->
+</main>
 
 <div id="carrinho">
   <h3>Carrinho</h3>
@@ -62,8 +63,8 @@ button:hover { transform: scale(1.05); }
   <h3>Painel do Dono</h3>
   <input type="text" id="nome-empresa" placeholder="Nome da sua loja">
   <textarea id="desc-loja" placeholder="Descrição da loja"></textarea>
-  <input type="text" id="logo-url" placeholder="URL da Logo">
-  <input type="text" id="fundo-url" placeholder="URL do Fundo">
+  <input type="text" id="logo-url" placeholder="URL da logo">
+  <input type="text" id="fundo-url" placeholder="URL do fundo">
   <h4>Personalização de cores</h4>
   <label>Cor de fundo: <input type="color" id="cor-fundo"></label>
   <label>Cor dos botões: <input type="color" id="cor-botoes"></label>
@@ -74,6 +75,9 @@ button:hover { transform: scale(1.05); }
     <option value="2">Layout 2</option>
     <option value="3">Layout 3</option>
   </select>
+  <h4>Planos</h4>
+  <p>Básico: grátis (1 layout, 5 produtos, cores e logo padrão)</p>
+  <p>Plus: R$15,99/mês (todos layouts, produtos ilimitados, cores e animações)</p>
   <button id="salvar-admin-btn">Salvar Alterações</button>
 </div>
 
@@ -84,7 +88,10 @@ button:hover { transform: scale(1.05); }
 const firebaseConfig = {
   apiKey: "AIzaSyAkooYQtwZa3ijKAu8Zl8iNV3vedf3oplI",
   authDomain: "alpha-marketplace-a5bee.firebaseapp.com",
-  projectId: "alpha-marketplace-a5bee"
+  projectId: "alpha-marketplace-a5bee",
+  storageBucket: "alpha-marketplace-a5bee.appspot.com",
+  messagingSenderId: "633576067411",
+  appId: "1:633576067411:web:f837cc956a21d02954d1a6"
 };
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
@@ -99,8 +106,8 @@ const loginBtn = document.getElementById('login-btn');
 const usuarioSpan = document.getElementById('usuario-logado');
 loginBtn.onclick = async () => {
   const provider = new firebase.auth.GoogleAuthProvider();
-  try { await auth.signInWithPopup(provider); } 
-  catch(e){ mostrarNotificacao('Erro no login'); }
+  try { await auth.signInWithPopup(provider); showNotificacao('Logado com sucesso!'); } 
+  catch(e){ showNotificacao('Erro no login'); }
 }
 auth.onAuthStateChanged(user => {
   if(user){ usuarioSpan.innerText = user.displayName; loginBtn.style.display='none'; } 
@@ -118,7 +125,7 @@ function carregarProdutos(){
   produtos.forEach(p=>{
     const card = document.createElement('div'); card.className='produto-card';
     card.dataset.id=p.id;
-    card.innerHTML=`<img src="${p.img}" alt="${p.nome}"><h3>${p.nome}</h3><p>${p.desc}</p><p>Preço: R$${p.preco.toFixed(2)}</p><p>Avaliação: ${'★'.repeat(p.avaliacao)+'☆'.repeat(5-p.avaliacao)}</p><button class="add-carrinho">Adicionar ao Carrinho</button>`;
+    card.innerHTML=`<img src="${p.img}" alt="${p.nome}"><h3>${p.nome}</h3><p>${p.desc}</p><p>Preço: <span style="background:#ff0;">R$${p.preco.toFixed(2)}</span></p><p>Avaliação: ${'★'.repeat(p.avaliacao)+'☆'.repeat(5-p.avaliacao)}</p><button class="add-carrinho">Adicionar ao Carrinho</button>`;
     conteudo.appendChild(card);
   });
   document.querySelectorAll('.add-carrinho').forEach(btn=>{
@@ -137,7 +144,7 @@ const carrinhoDiv = document.getElementById('carrinho');
 document.getElementById('menu-carrinho-btn').onclick = ()=>{carrinhoDiv.style.display=carrinhoDiv.style.display==='block'?'none':'block';};
 function adicionarCarrinho(id){
   const p=produtos.find(x=>x.id===id);
-  carrinho.push(p); atualizarCarrinho(); mostrarNotificacao('Produto adicionado ao carrinho');
+  carrinho.push(p); atualizarCarrinho(); showNotificacao(`${p.nome} adicionado ao carrinho!`);
 }
 function atualizarCarrinho(){
   const div=document.getElementById('itens-carrinho'); div.innerHTML='';
@@ -147,12 +154,12 @@ function atualizarCarrinho(){
   });
   div.innerHTML+=`<p><b>Total: R$${total.toFixed(2)}</b></p>`;
 }
-function removerCarrinho(i){ carrinho.splice(i,1); atualizarCarrinho(); mostrarNotificacao('Produto removido'); }
+function removerCarrinho(i){ carrinho.splice(i,1); atualizarCarrinho(); showNotificacao('Produto removido!'); }
 document.getElementById('finalizar-pedido').onclick=async()=>{
-  const user=auth.currentUser; if(!user){ mostrarNotificacao('Precisa logar para finalizar'); return;}
+  const user=auth.currentUser; if(!user){showNotificacao('Precisa logar para finalizar!'); return;}
   const pedidoRef=db.collection('pedidos').doc();
   await pedidoRef.set({usuario:user.uid,itens:carrinho,timestamp:firebase.firestore.FieldValue.serverTimestamp()});
-  mostrarNotificacao('Pedido finalizado!');
+  showNotificacao('Pedido finalizado!');
   carrinho=[]; atualizarCarrinho();
 }
 
@@ -160,42 +167,36 @@ document.getElementById('finalizar-pedido').onclick=async()=>{
 const painel=document.getElementById('painel-admin');
 document.getElementById('menu-admin-btn').onclick = ()=>{ painel.style.display=painel.style.display==='block'?'none':'block'; };
 document.getElementById('salvar-admin-btn').onclick = async ()=>{
-  const user=auth.currentUser; 
-  if(!user){ mostrarNotificacao('Precisa logar como dono'); return;}
+  const user=auth.currentUser; if(!user){showNotificacao('Precisa logar como dono'); return;}
+  // Substitua pelo seu UID real
   const UID_DO_DONO = "SEU_UID_AQUI";
-  if(user.uid !== UID_DO_DONO){ mostrarNotificacao('Você não tem permissão!'); return; }
+  if(user.uid!==UID_DO_DONO){showNotificacao('Você não tem permissão!'); return;}
 
   const nome=document.getElementById('nome-empresa').value;
   const desc=document.getElementById('desc-loja').value;
-  const logo=document.getElementById('logo-url').value;
-  const fundo=document.getElementById('fundo-url').value;
+  const logoUrl=document.getElementById('logo-url').value;
+  const fundoUrl=document.getElementById('fundo-url').value;
   const corFundo=document.getElementById('cor-fundo').value;
   const corBotoes=document.getElementById('cor-botoes').value;
   const corTexto=document.getElementById('cor-texto').value;
   const layout=document.getElementById('layout-loja').value;
 
-  await db.collection('admin').doc(user.uid).set({
-    nomeEmpresa:nome,
-    descLoja:desc,
-    logo, fundo,
-    corFundo, corBotoes, corTexto, layout
-  },{merge:true});
-
-  document.getElementById('logo').src=logo;
-  document.body.style.backgroundImage=fundo?`url(${fundo})`:'';
+  document.getElementById('logo').src=logoUrl||'https://via.placeholder.com/50x50?text=Logo';
+  document.body.style.background=fundoUrl?`url(${fundoUrl}) no-repeat center/cover`:corFundo;
   document.body.style.backgroundColor=corFundo;
   document.querySelectorAll('button').forEach(btn=>btn.style.backgroundColor=corBotoes);
-  document.querySelectorAll('h1,h2,h3,h4,p,div').forEach(el=>el.style.color=corTexto);
-  document.getElementById('nome-loja-display').innerText=nome;
-
-  mostrarNotificacao('Alterações salvas!');
+  document.querySelectorAll('h1,h2,h3,h4,p,div,span').forEach(el=>el.style.color=corTexto);
+  document.getElementById('nome-loja-display').innerText=nome||'Sua Loja';
+  showNotificacao('Alterações salvas!');
 }
 
-// Notificação animada
-function mostrarNotificacao(msg){
-  const n=document.getElementById('notificacao');
-  n.innerText=msg; n.style.display='block';
-  setTimeout(()=>{ n.style.display='none'; },2000);
+// Notificações animadas
+const notificacaoDiv=document.getElementById('notificacao');
+function showNotificacao(msg){
+  notificacaoDiv.innerText=msg;
+  notificacaoDiv.style.opacity='1';
+  notificacaoDiv.style.transform='translateY(0)';
+  setTimeout(()=>{ notificacaoDiv.style.opacity='0'; notificacaoDiv.style.transform='translateY(-20px)'; },2000);
 }
 </script>
 
