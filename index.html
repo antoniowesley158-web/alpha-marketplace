@@ -7,7 +7,6 @@
 <style>
 body { font-family: Arial; margin:0; transition: background 0.3s; background:#f2f2f2; }
 header { display:flex; justify-content:space-between; align-items:center; padding:10px; background:#333; color:white; position:relative; }
-#voltar { cursor:pointer; font-size:24px; margin-right:10px; }
 #menu-hamburguer { cursor:pointer; font-size:24px; }
 #menu-lateral { position:fixed; left:-250px; top:0; width:250px; height:100%; background:#222; color:white; transition: left 0.3s; overflow:auto; z-index:998; }
 #menu-lateral.aberto { left:0; }
@@ -21,7 +20,8 @@ header { display:flex; justify-content:space-between; align-items:center; paddin
 button { padding:10px 20px; border:none; cursor:pointer; transition: transform 0.2s; margin-top:5px; border-radius:5px; }
 button:hover { transform: scale(1.05); }
 #painel-admin { display:none; background:#eee; padding:20px; position:fixed; top:5%; left:50%; transform:translateX(-50%); width:90%; max-width:520px; border-radius:10px; box-shadow:0 4px 12px rgba(0,0,0,0.3); z-index:1000; overflow:auto; max-height:90vh; }
-#painel-admin h3 { margin-top:0; }
+#painel-admin h3 { margin-top:0; display:flex; justify-content:space-between; align-items:center; }
+#painel-admin h3 span { cursor:pointer; font-weight:bold; }
 .admin-section { margin-bottom:20px; padding:10px; background:#ddd; border-radius:8px; }
 .admin-section label { display:block; margin:5px 0; }
 #carrinho { display:none; position:fixed; top:10%; right:10px; background:white; padding:15px; border-radius:8px; box-shadow:0 4px 10px rgba(0,0,0,0.3); max-width:300px; z-index:999; }
@@ -50,7 +50,6 @@ const storage = getStorage();
 // Menu
 const menu = document.getElementById('menu-lateral');
 document.getElementById('menu-hamburguer').onclick = () => menu.classList.toggle('aberto');
-document.getElementById('voltar').onclick = () => window.history.back();
 
 // Login
 const loginBtn = document.getElementById('login-btn');
@@ -70,27 +69,11 @@ function mostrarNotificacao(msg,destaque=null){
   setTimeout(()=>{ div.style.display='none'; },3500);
 }
 
-// Produtos
-const produtos=[
-  {id:1,nome:'Produto 1',desc:'Descrição do produto 1',preco:19.90,img:'https://via.placeholder.com/200x150',avaliacao:4},
-  {id:2,nome:'Produto 2',desc:'Descrição do produto 2',preco:29.90,img:'https://via.placeholder.com/200x150',avaliacao:3},
-];
-const conteudo=document.getElementById('conteudo');
-function carregarProdutos(){ conteudo.innerHTML=''; produtos.forEach(p=>{ const card=document.createElement('div'); card.className='produto-card'; card.dataset.id=p.id; card.innerHTML=`<img src="${p.img}" alt="${p.nome}"><h3>${p.nome}</h3><p>${p.desc}</p><p>Preço: <span style="background:#0a84ff;color:white;padding:2px 5px;border-radius:3px;">R$${p.preco.toFixed(2)}</span></p><p>Avaliação: ${'★'.repeat(p.avaliacao)+'☆'.repeat(5-p.avaliacao)}</p><button class="add-carrinho">Adicionar ao Carrinho</button>`; conteudo.appendChild(card); }); document.querySelectorAll('.add-carrinho').forEach(btn=>{ btn.onclick=(e)=>{ const card=e.target.closest('.produto-card'); const id=parseInt(card.dataset.id); adicionarCarrinho(id); } }); }
-carregarProdutos();
-
-// Carrinho
-let carrinho=[];
-const carrinhoDiv=document.getElementById('carrinho');
-document.getElementById('menu-carrinho-btn').onclick=()=>{ carrinhoDiv.style.display=carrinhoDiv.style.display==='block'?'none':'block'; };
-function adicionarCarrinho(id){ const p=produtos.find(x=>x.id===id); carrinho.push(p); atualizarCarrinho(); mostrarNotificacao(`Produto "${p.nome}" adicionado ao carrinho!`, p.nome); }
-function atualizarCarrinho(){ const div=document.getElementById('itens-carrinho'); div.innerHTML=''; let total=0; carrinho.forEach((i,idx)=>{ div.innerHTML+=`<p>${i.nome} - <span style="background:#ffd700;color:#000;padding:2px 5px;border-radius:3px;">R$${i.preco.toFixed(2)}</span> <button onclick="removerCarrinho(${idx})">X</button></p>`; total+=i.preco; }); div.innerHTML+=`<p><b>Total: <span style="background:#0a84ff;color:white;padding:2px 5px;border-radius:3px;">R$${total.toFixed(2)}</span></b></p>`; }
-function removerCarrinho(i){ carrinho.splice(i,1); atualizarCarrinho(); }
-document.getElementById('finalizar-pedido').onclick=async()=>{ const user=auth.currentUser; if(!user){ mostrarNotificacao('Precisa logar para finalizar'); return; } const pedidoRef=doc(collection(db,'pedidos')); await setDoc(pedidoRef,{usuario:user.uid,itens:carrinho,timestamp:serverTimestamp()}); mostrarNotificacao('Pedido finalizado com sucesso!'); carrinho=[]; atualizarCarrinho(); };
-
-// Painel do dono refatorado
+// Painel do dono
 const painel=document.getElementById('painel-admin');
-document.getElementById('menu-admin-btn').onclick=()=>{ painel.style.display=painel.style.display==='block'?'none':'block'; };
+document.getElementById('menu-admin-btn').onclick=()=>{ painel.style.display='block'; };
+document.querySelector('#painel-admin h3 span').onclick = ()=>{ painel.style.display='none'; };
+
 document.getElementById('salvar-admin-btn').onclick=async()=>{
   const user=auth.currentUser; if(!user){ mostrarNotificacao('Precisa logar como dono'); return; }
 
@@ -105,23 +88,24 @@ document.getElementById('salvar-admin-btn').onclick=async()=>{
   const layout=document.getElementById('layout-loja').value;
   const fonte=document.getElementById('fonte-loja').value;
 
-  let logoUrl='', fundoUrl='';
-  if(logoFile){ const sRef=ref(storage,'logos/'+user.uid+'_'+logoFile.name); await uploadBytes(sRef,logoFile); logoUrl=await getDownloadURL(sRef); document.getElementById('logo').src=logoUrl; }
-  if(fundoFile){ const sRef=ref(storage,'fundos/'+user.uid+'_'+fundoFile.name); await uploadBytes(sRef,fundoFile); fundoUrl=await getDownloadURL(sRef); document.body.style.background=`url(${fundoUrl}) no-repeat center/cover`; }
+  try{
+    let logoUrl='', fundoUrl='';
+    if(logoFile){ const sRef=ref(storage,'logos/'+user.uid+'_'+logoFile.name); await uploadBytes(sRef,logoFile); logoUrl=await getDownloadURL(sRef); document.getElementById('logo').src=logoUrl; }
+    if(fundoFile){ const sRef=ref(storage,'fundos/'+user.uid+'_'+fundoFile.name); await uploadBytes(sRef,fundoFile); fundoUrl=await getDownloadURL(sRef); document.body.style.background=`url(${fundoUrl}) no-repeat center/cover`; }
 
-  await setDoc(doc(db,'admin',user.uid),{nomeEmpresa:nome,descLoja:desc,logo:logoUrl,fundo:fundoUrl,corFundo,corBotoes,corTexto,layout,fonte},{merge:true});
-  document.body.style.backgroundColor=corFundo;
-  document.querySelectorAll('button').forEach(btn=>btn.style.backgroundColor=corBotoes);
-  document.querySelectorAll('h1,h2,h3,h4,p,div').forEach(el=>{ el.style.color=corTexto; el.style.fontFamily=fonte; });
-  document.getElementById('nome-loja-display').innerText=nome;
-  mostrarNotificacao('Alterações salvas com sucesso!');
+    await setDoc(doc(db,'admin',user.uid),{nomeEmpresa:nome,descLoja:desc,logo:logoUrl,fundo:fundoUrl,corFundo,corBotoes,corTexto,layout,fonte},{merge:true});
+    document.body.style.backgroundColor=corFundo;
+    document.querySelectorAll('button').forEach(btn=>btn.style.backgroundColor=corBotoes);
+    document.querySelectorAll('h1,h2,h3,h4,p,div').forEach(el=>{ el.style.color=corTexto; el.style.fontFamily=fonte; });
+    document.getElementById('nome-loja-display').innerText=nome;
+    mostrarNotificacao('Alterações salvas com sucesso!');
+  } catch(e){ mostrarNotificacao('Erro ao salvar alterações!'); console.error(e); }
 };
 </script>
 </head>
 <body>
 
 <header>
-  <div id="voltar">←</div>
   <div id="logo-container"><img id="logo" src="default-logo.png" alt="Logo" width="50"></div>
   <div id="nome-loja-display">Sua Loja</div>
   <div>
@@ -142,14 +126,8 @@ document.getElementById('salvar-admin-btn').onclick=async()=>{
 
 <main id="conteudo"></main>
 
-<div id="carrinho">
-  <h3>Carrinho</h3>
-  <div id="itens-carrinho"></div>
-  <button id="finalizar-pedido">Finalizar Pedido</button>
-</div>
-
 <div id="painel-admin">
-  <h3>Painel do Dono</h3>
+  <h3>Painel do Dono <span>X</span></h3>
   <div class="admin-section">
     <label>Nome da loja: <input type="text" id="nome-empresa"></label>
     <label>Descrição: <textarea id="desc-loja"></textarea></label>
