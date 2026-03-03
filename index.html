@@ -22,6 +22,7 @@
   <input type="email" id="login-email" placeholder="Email">
   <input type="password" id="login-password" placeholder="Senha">
   <button id="login-btn">Entrar</button>
+  <button id="login-google-btn" style="background:#db4437;">Entrar com Google</button>
   <div class="link" id="show-register">Não tem conta? Cadastre-se</div>
 </div>
 
@@ -105,7 +106,7 @@
       .catch(err => alert(err.message));
   }
 
-  // Login
+  // Login Email/Senha
   document.getElementById('login-btn').onclick = () => {
     const email = document.getElementById('login-email').value;
     const password = document.getElementById('login-password').value;
@@ -113,6 +114,24 @@
     auth.signInWithEmailAndPassword(email, password)
       .then(() => {
         loginContainer.style.display='none';
+        appDiv.style.display='block';
+        carregarProdutos();
+      })
+      .catch(err => alert(err.message));
+  }
+
+  // Login Google
+  document.getElementById('login-google-btn').onclick = () => {
+    var provider = new firebase.auth.GoogleAuthProvider();
+    auth.signInWithPopup(provider)
+      .then(result => {
+        var user = result.user;
+        db.collection('users').doc(user.uid).set({
+          name: user.displayName,
+          email: user.email
+        }, {merge:true});
+        loginContainer.style.display='none';
+        registerContainer.style.display='none';
         appDiv.style.display='block';
         carregarProdutos();
       })
@@ -171,4 +190,4 @@
   }
 </script>
 </body>
-</html>
+  </html>
