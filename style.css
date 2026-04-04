@@ -1,7 +1,7 @@
 body {
 margin: 0;
 font-family: Arial, sans-serif;
-background: #0f0f0f;
+background: linear-gradient(135deg, #0f0f0f, #1a1a1a);
 color: white;
 }
 
@@ -9,22 +9,109 @@ header {
 display: flex;
 justify-content: space-between;
 align-items: center;
-padding: 15px;
+padding: 15px 20px;
 background: #111;
-box-shadow: 0 0 15px #ff0000;
+box-shadow: 0 0 20px #ff000050;
+position: sticky;
+top: 0;
+z-index: 1000;
 }
 
 .logo {
 font-size: 20px;
 font-weight: bold;
 color: red;
-}.chave {
+}
+
+.menu-btn {
+background: none;
+border: none;
+color: white;
+font-size: 24px;
+cursor: pointer;
+}
+
+.menu {
+position: fixed;
+top: 0;
+left: -250px;
+width: 250px;
+height: 100%;
+background: #151515;
+display: flex;
+flex-direction: column;
+padding-top: 70px;
+transition: 0.3s;
+box-shadow: 0 0 20px #000;
+}
+
+.menu a {
+padding: 15px 20px;
+text-decoration: none;
+color: white;
+border-bottom: 1px solid #222;
+}
+
+.menu a:hover {
+background: red;
+}
+
+.menu.active {
+left: 0;
+}
+
+main {
+max-width: 900px;
+margin: auto;
+padding: 40px 20px;
+}
+
+.section-title {
+font-size: 28px;
+margin-bottom: 25px;
+color: red;
+}
+
+.card {
+background: #1a1a1a;
+padding: 20px;
+margin-bottom: 20px;
+border-radius: 12px;
+box-shadow: 0 0 15px #ff000040;
+transition: 0.3s;
+}
+
+.card:hover {
+transform: translateY(-5px);
+box-shadow: 0 0 25px red;
+}
+
+.card h2 {
+margin-top: 0;
+color: white;
+}
+
+.card p {
+opacity: 0.8;
+}
+
+.card a {
+display: inline-block;
+margin-top: 10px;
+padding: 10px 15px;
+background: red;
+color: white;
+text-decoration: none;
+border-radius: 6px;
+font-weight: bold;
+}
+
+.chave {
 background: #111;
 padding: 15px;
-border: 2px solid #00ffff;
+border: 2px solid red;
 border-radius: 8px;
-margin: 10px 0;
-color: #00ffff;
+margin: 15px 0;
 text-align: center;
 font-weight: bold;
 }
@@ -42,53 +129,5 @@ transition: 0.3s;
 }
 
 .whatsapp-btn:hover {
-opacity: 0.8;
-}
-
-.menu-btn {
-background: none;
-border: none;
-color: white;
-font-size: 24px;
-cursor: pointer;
-}
-
-.menu {
-position: fixed;
-top: 0;
-left: -250px;
-width: 250px;
-height: 100%;
-background: #1a1a1a;
-display: flex;
-flex-direction: column;
-padding-top: 60px;
-transition: 0.3s;
-}
-
-.menu a {
-padding: 15px;
-text-decoration: none;
-color: white;
-border-bottom: 1px solid #222;
-}
-
-.menu a:hover {
-background: red;
-}
-
-.menu.active {
-left: 0;
-}
-
-main {
-padding: 30px;
-}
-
-.card {
-background: #1a1a1a;
-padding: 15px;
-margin: 15px 0;
-border-radius: 10px;
-box-shadow: 0 0 10px red;
+opacity: 0.85;
 }
