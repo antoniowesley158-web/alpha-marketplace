@@ -3,36 +3,43 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pagamento - Alpha Marketplace</title>
-<link rel="stylesheet" href="style.css">
+<title>Pagamento Pix</title>
+<link rel="stylesheet" href="estilo.css">
 </head>
 <body>
+
 <header>
-  <div id="logo-container"><img id="logo" src="https://i.ibb.co/yhhnR8x/lobo.png" alt="Logo"></div>
-  <div id="menu-header">
-    <button class="menu-btn" id="abrir-menu">☰ Menu</button>
-  </div>
+<div class="logo">💳 Pagamento</div>
+<button class="menu-btn" onclick="toggleMenu()">☰</button>
 </header>
 
-<nav id="menu-lateral">
-  <span id="voltar">← Voltar</span>
-  <ul>
-    <li><a href="index.html">Home</a></li>
-    <li><a href="produtos.html">Produtos</a></li>
-    <li><a href="avaliacoes.html">Avaliações</a></li>
-    <li><a href="sobre.html">Sobre a Loja</a></li>
-    <li><a href="jogos.html">Jogos Populares</a></li>
-    <li><a href="admin.html">Admin</a></li>
-  </ul>
+<nav id="menu" class="menu">
+<a href="index.html">Início</a>
+<a href="produtos.html">Produtos</a>
+<a href="avaliacoes.html">Avaliações</a>
+<a href="sobre.html">Sobre</a>
 </nav>
 
-<section id="pagamento">
-  <h2>Pagamento</h2>
-  <p style="color:#0ff;">Aqui vamos integrar Mercado Pago ou Pix futuramente.</p>
-  <button>Pagar Agora</button>
-</section>
+<main>
 
-<div id="aviso"></div>
-<script src="script.js" type="module"></script>
+<div class="card">
+<h2>Pagamento via Pix</h2>
+
+<p><strong>Chave Pix:</strong></p>
+<div class="chave">85997629672</div>
+
+<p>Após realizar o pagamento, envie o comprovante pelo WhatsApp para liberação da conta.</p>
+
+<a class="whatsapp-btn"
+href="https://wa.me/5585997629672?text=🔥%20Olá!%20Acabei%20de%20realizar%20o%20pagamento%20via%20Pix%20na%20Alpha%20WSX.%20Segue%20meu%20comprovante%20para%20confirmação.%20💳✅"
+target="_blank">
+Enviar comprovante no WhatsApp
+</a>
+
+</div>
+
+</main>
+
+<script src="script.js"></script>
 </body>
 </html>
