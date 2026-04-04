@@ -3,266 +3,28 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Alpha Marketplace</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
-
-<style>
-body { margin:0; font-family:'Roboto', sans-serif; background:#0a0a0a; color:#fff; overflow-x:hidden; transition: background 0.3s; }
-h1,h2,h3,h4,h5,h6 { font-family:'Orbitron', sans-serif; color:#0ff; text-shadow:0 0 8px #0ff; }
-
-/* Fundo animado */
-#fundo-animado { position:fixed; top:0; left:0; width:100%; height:100%; z-index:-1; background:linear-gradient(120deg,#0a0a0a,#111); overflow:hidden; }
-.particula { position:absolute; border-radius:50%; background:#0ff; opacity:0.5; }
-
-/* Header */
-header { display:flex; justify-content:space-between; align-items:center; padding:15px 20px; background:rgba(0,0,0,0.6); backdrop-filter:blur(4px); position:relative; z-index:100; }
-#logo { width:60px; }
-#menu-header { display:flex; gap:10px; align-items:center; }
-.menu-btn { background:transparent; border:2px solid #0ff; color:#0ff; padding:10px 20px; border-radius:6px; cursor:pointer; transition:0.3s; text-transform:uppercase; font-weight:500; }
-.menu-btn:hover { background:#0ff; color:#000; box-shadow:0 0 12px #0ff, 0 0 20px #0ff inset; }
-
-/* Menu lateral */
-#menu-lateral { position:fixed; top:0; left:-260px; width:260px; height:100%; background:rgba(0,0,0,0.95); backdrop-filter:blur(6px); color:#0ff; transition:0.4s; z-index:101; padding:20px; overflow:hidden; }
-#menu-lateral.aberto { left:0; }
-#menu-lateral ul { list-style:none; padding:0; margin:0; }
-#menu-lateral li { padding:15px 0; cursor:pointer; border-bottom:1px solid rgba(0,255,255,0.2); transition:0.3s; }
-#menu-lateral li:hover { background:rgba(0,255,255,0.1); transform:translateX(5px); }
-
-/* Setinha de voltar */
-#voltar { font-size:1.5em; cursor:pointer; margin-bottom:20px; display:inline-block; transition:0.3s; }
-#voltar:hover { transform:translateX(-5px); }
-
-/* Banner inicial */
-.hero { text-align:center; padding:150px 20px; }
-.hero h1 { font-size:3em; }
-.hero p { font-size:1.2em; margin:15px 0; }
-
-/* Seções */
-section { padding:80px 20px; max-width:1000px; margin:0 auto; }
-
-/* Produtos */
-.produto-card { background:rgba(20,20,20,0.8); padding:15px; border-radius:10px; box-shadow:0 0 15px #0ff; margin:15px; display:inline-block; vertical-align:top; width:200px; text-align:center; transition:0.3s; }
-.produto-card img { width:100%; border-radius:8px; }
-.produto-card:hover { transform:scale(1.05); }
-
-/* Feedbacks */
-.feedback { background:rgba(20,20,20,0.8); padding:15px; border-radius:10px; box-shadow:0 0 15px #0ff; margin-bottom:15px; }
-
-/* Textareas/inputs bonitinhos */
-textarea, input { width:100%; padding:10px; border-radius:8px; border:2px solid #0ff; background:rgba(20,20,20,0.9); color:#fff; margin-bottom:10px; box-shadow:0 0 8px #0ff inset; font-family:'Roboto', sans-serif; transition:0.3s; }
-textarea:focus, input:focus { outline:none; border-color:#0ff; box-shadow:0 0 12px #0ff inset; }
-
-/* Jogos Populares */
-.icones-jogos { display:flex; gap:20px; flex-wrap:wrap; justify-content:center; margin-top:20px; }
-.icone { text-align:center; transition:0.3s; cursor:pointer; }
-.icone img { width:80px; height:80px; border-radius:12px; box-shadow:0 0 12px #0ff; }
-.icone:hover img { transform:scale(1.2); box-shadow:0 0 20px #0ff; }
-.icone p { margin-top:5px; font-family:'Orbitron', sans-serif; color:#0ff; text-shadow:0 0 8px #0ff; }
-
-/* Pagamento */
-.pagamento { text-align:center; margin-top:20px; }
-.pagamento button { background:#0ff; color:#000; border:none; padding:12px 25px; border-radius:8px; cursor:pointer; font-weight:bold; transition:0.3s; }
-.pagamento button:hover { background:#00ffff; }
-
-/* Avisos animados */
-#aviso { position:fixed; top:20px; right:20px; background:#f00; color:#fff; padding:15px 25px; border-radius:8px; display:none; animation:fadeInOut 2.5s ease forwards; font-weight:bold; z-index:999; box-shadow:0 0 15px #f00; }
-@keyframes fadeInOut { 0%{opacity:0; transform:translateY(-20px);} 10%,90%{opacity:1; transform:translateY(0);} 100%{opacity:0; transform:translateY(-20px);} }
-</style>
+<title>Mercado Alpha</title>
+<link rel="stylesheet" href="estilo.css">
 </head>
-
 <body>
-<div id="fundo-animado"></div>
 
 <header>
-  <div id="logo-container"><img id="logo" src="https://i.ibb.co/yhhnR8x/lobo.png" alt="Logo"></div>
-  <div id="menu-header">
-    <button class="menu-btn" id="abrir-menu">☰ Menu</button>
-  </div>
+<div class="logo">🔥 Mercado Alpha</div>
+<button class="menu-btn" onclick="toggleMenu()">☰</button>
 </header>
 
-<nav id="menu-lateral">
-  <span id="voltar">← Voltar</span>
-  <ul>
-    <li data-secao="produtos">Produtos</li>
-    <li data-secao="avaliacoes">Avaliações</li>
-    <li data-secao="sobre">Sobre a Loja</li>
-    <li data-secao="jogos-populares">Jogos Populares</li>
-    <li data-secao="pagamento">Pagamento</li>
-    <li data-secao="admin">Admin (Somente Você)</li>
-  </ul>
+<nav id="menu" class="menu">
+<a href="index.html">Início</a>
+<a href="produtos.html">Produtos</a>
+<a href="avaliacoes.html">Avaliações</a>
+<a href="sobre.html">Sobre</a>
 </nav>
 
-<div class="hero">
-  <h1>Alpha Marketplace</h1>
-  <p>Sua loja gamer com estilo profissional!</p>
-</div>
+<main>
+<h1>Bem-vindo à loja</h1>
+<p>Os melhores produtos digitais organizados pra você.</p>
+</main>
 
-<section id="produtos">
-  <h2>Produtos</h2>
-  <div id="lista-produtos"></div>
-  <button id="adicionar-produto">Adicionar Produto</button>
-</section>
-
-<section id="avaliacoes">
-  <h2>Avaliações / Feedbacks</h2>
-  <div id="lista-feedbacks"></div>
-  <textarea id="novo-feedback" placeholder="Escreva um feedback"></textarea>
-  <button id="enviar-feedback">Enviar Feedback</button>
-</section>
-
-<section id="sobre">
-  <h2>Sobre a Loja</h2>
-  <textarea id="descricao-loja" placeholder="Descrição da loja"></textarea>
-  <button id="salvar-descricao">Salvar Descrição</button>
-</section>
-
-<section id="jogos-populares">
-  <h2>Jogos Populares</h2>
-  <div class="icones-jogos">
-    <div class="icone"><img src="https://i.ibb.co/icone-roblox.png" alt="Roblox"><p>Roblox</p></div>
-    <div class="icone"><img src="https://i.ibb.co/icone-ff.png" alt="Free Fire"><p>Free Fire</p></div>
-    <div class="icone"><img src="https://i.ibb.co/icone-ggmax.png" alt="Ggmax"><p>Ggmax</p></div>
-    <div class="icone"><img src="https://i.ibb.co/icone-minecraft.png" alt="Minecraft"><p>Minecraft</p></div>
-  </div>
-</section>
-
-<section id="pagamento">
-  <h2>Pagamento</h2>
-  <div class="pagamento">
-    <button>Mercado Pago</button>
-    <button>Cartão de Crédito</button>
-    <button>Pix</button>
-  </div>
-</section>
-
-<section id="admin" style="display:none;">
-  <h2>Painel Admin</h2>
-  <input type="text" id="admin-nome" placeholder="Nome da Loja">
-  <textarea id="admin-desc" placeholder="Descrição da Loja"></textarea>
-  <input type="number" id="admin-estoque" placeholder="Estoque Total">
-  <button id="salvar-admin">Salvar Alterações</button>
-  <button id="esqueci-senha">Esqueci a Senha</button>
-</section>
-
-<div id="aviso"></div>
-
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyAkooYQtwZa3ijKAu8Zl8iNV3vedf3oplI",
-  authDomain: "alpha-marketplace-a5bee.firebaseapp.com",
-  projectId: "alpha-marketplace-a5bee",
-  storageBucket: "alpha-marketplace-a5bee.firebasestorage.app",
-  messagingSenderId: "633576067411",
-  appId: "1:633576067411:web:f837cc956a21d02954d1a6"
-};
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-// Menu animado
-const menu = document.getElementById('menu-lateral');
-document.getElementById('abrir-menu').onclick = ()=> menu.classList.toggle('aberto');
-document.getElementById('voltar').onclick = ()=> menu.classList.remove('aberto');
-
-// Troca de seção
-document.querySelectorAll('#menu-lateral li').forEach(li=>{
-  li.onclick = ()=>{
-    const secao = document.getElementById(li.dataset.secao);
-    if(secao) secao.scrollIntoView({behavior:'smooth'});
-    menu.classList.remove('aberto');
-  }
-});
-
-// Fundo animado
-const fundo = document.getElementById('fundo-animado');
-for(let i=0;i<50;i++){
-  const p = document.createElement('div'); p.className='particula';
-  p.style.width = p.style.height = Math.random()*5+2+'px';
-  p.style.top = Math.random()*100+'%';
-  p.style.left = Math.random()*100+'%';
-  fundo.appendChild(p);
-}
-
-// Avisos
-function mostrarAviso(msg){
-  const aviso = document.getElementById('aviso');
-  aviso.innerText = msg;
-  aviso.style.display='block';
-  setTimeout(()=>{ aviso.style.display='none'; },2500);
-}
-
-// Produtos
-const listaProdutos = document.getElementById('lista-produtos');
-const produtos = [];
-document.getElementById('adicionar-produto').onclick = ()=>{
-  const nome = prompt("Nome do produto:");
-  const preco = prompt("Preço do produto:");
-  const img = prompt("URL da imagem:");
-  const estoque = prompt("Quantidade em estoque:");
-  if(nome && preco && estoque){
-    const p = {nome, preco, img, estoque:Number(estoque)};
-    produtos.push(p);
-    const div = document.createElement('div');
-    div.className='produto-card';
-    div.innerHTML = `<img src="${img}" alt="${nome}"><h3>${nome}</h3><p>Preço: R$${preco}</p><p>Estoque: ${estoque}</p>`;
-    listaProdutos.appendChild(div);
-    mostrarAviso('Produto adicionado com sucesso!');
-  }
-}
-
-// Feedbacks
-const listaFeedbacks = document.getElementById('lista-feedbacks');
-document.getElementById('enviar-feedback').onclick = ()=>{
-  const fb = document.getElementById('novo-feedback').value;
-  if(fb){
-    const div = document.createElement('div');
-    div.className='feedback';
-    div.innerText = fb;
-    listaFeedbacks.appendChild(div);
-    document.getElementById('novo-feedback').value='';
-    mostrarAviso('Feedback enviado!');
-  }
-}
-
-// Sobre a loja
-document.getElementById('salvar-descricao').onclick = ()=>{
-  const desc = document.getElementById('descricao-loja').value;
-  mostrarAviso('Descrição da loja salva!');
-}
-
-// Admin
-let senhaAdmin = "1234";
-document.querySelector('#menu-lateral li[data-secao="admin"]').onclick = ()=>{
-  const input = prompt("Digite a senha do admin:");
-  if(input===senhaAdmin){
-    document.getElementById('admin').style.display='block';
-    mostrarAviso('Bem-vindo, Admin!');
-  } else {
-    mostrarAviso('Senha incorreta');
-  }
-}
-
-// Esqueci a senha
-document.getElementById('esqueci-senha').onclick = ()=>{
-  const email = prompt("Digite seu e-mail para recuperar a senha:");
-  if(email){
-    mostrarAviso(`Link de recuperação enviado para ${email}`);
-  } else {
-    mostrarAviso("E-mail não informado");
-  }
-}
-
-// Salvar admin
-document.getElementById('salvar-admin').onclick = ()=>{
-  const nome = document.getElementById('admin-nome').value;
-  const desc = document.getElementById('admin-desc').value;
-  const estoque = document.getElementById('admin-estoque').value;
-  mostrarAviso('Alterações salvas!');
-}
-</script>
-
+<script src="script.js"></script>
 </body>
 </html>
