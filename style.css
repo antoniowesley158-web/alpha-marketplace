@@ -1,40 +1,137 @@
-body {
+/* RESET */
+* {
   margin: 0;
+  padding: 0;
+  box-sizing: border-box;
   font-family: Arial, sans-serif;
-  background: #0f0f0f;
+}
+
+/* BODY */
+body {
+  background: linear-gradient(135deg, #0f0f0f, #1a1a1a);
   color: white;
-  text-align: center;
+  min-height: 100vh;
 }
 
+/* HEADER */
 header {
-  padding: 30px;
-}
-
-.produto {
-  background: #1a1a1a;
-  margin: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   padding: 20px;
-  border-radius: 15px;
+  background: #121212;
+  box-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
 }
 
-.produto img {
-  width: 90%;
-  max-width: 400px;
-  border-radius: 10px;
-}
-
-.preco {
-  font-size: 28px;
+.logo {
+  font-size: 20px;
+  font-weight: bold;
   color: #00ff88;
+}
+
+header button {
+  background: none;
+  border: none;
+  color: #00ff88;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+/* MENU LATERAL */
+.menu {
+  position: fixed;
+  top: 0;
+  left: -250px;
+  width: 250px;
+  height: 100%;
+  background: #1c1c1c;
+  display: flex;
+  flex-direction: column;
+  padding-top: 80px;
+  transition: 0.3s ease;
+  box-shadow: 5px 0 15px rgba(0,0,0,0.5);
+}
+
+.menu a {
+  padding: 15px 20px;
+  text-decoration: none;
+  color: white;
+  border-bottom: 1px solid #2a2a2a;
+}
+
+.menu a:hover {
+  background: #00ff88;
+  color: black;
+}
+
+.menu.ativo {
+  left: 0;
+}
+
+/* SEÇÃO PRODUTO */
+.produto {
+  max-width: 500px;
+  margin: 60px auto;
+  padding: 30px;
+  background: #1c1c1c;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 0 20px rgba(0,255,136,0.1);
+  animation: aparecer 0.6s ease;
+}
+
+.produto h1,
+.produto h2 {
+  margin-bottom: 15px;
+}
+
+.produto p {
+  margin-bottom: 10px;
+  color: #cccccc;
+}
+
+.produto ul {
+  list-style: none;
   margin: 15px 0;
 }
 
+.produto ul li {
+  margin-bottom: 8px;
+}
+
+/* PREÇO */
+.preco {
+  font-size: 26px;
+  color: #00ff88;
+  margin: 15px 0;
+  font-weight: bold;
+}
+
+/* BOTÃO */
 .botao {
   display: inline-block;
-  padding: 15px 25px;
+  padding: 12px 25px;
   background: #00ff88;
   color: black;
   text-decoration: none;
-  border-radius: 10px;
+  border-radius: 8px;
   font-weight: bold;
+  transition: 0.3s ease;
+}
+
+.botao:hover {
+  background: #00cc6a;
+  transform: scale(1.05);
+}
+
+/* ANIMAÇÃO */
+@keyframes aparecer {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
