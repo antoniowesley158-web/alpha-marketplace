@@ -1,43 +1,64 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pagamento Pix</title>
-<link rel="stylesheet" href="estilo.css">
+<title>Pagamento - Alpha WSX</title>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #0f0f0f;
+  color: white;
+  text-align: center;
+  padding: 40px;
+}
+
+.caixa {
+  background: #1c1c1c;
+  padding: 30px;
+  border-radius: 10px;
+  max-width: 400px;
+  margin: auto;
+}
+
+.botao {
+  background: #00ff88;
+  color: black;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-top: 15px;
+}
+
+.botao:hover {
+  background: #00cc6a;
+}
+</style>
 </head>
+
 <body>
 
-<header>
-<div class="logo">💳 Pagamento</div>
-<button class="menu-btn" onclick="toggleMenu()">☰</button>
-</header>
+<div class="caixa">
+  <h2>Finalizar Pagamento</h2>
 
-<nav id="menu" class="menu">
-<a href="index.html">Início</a>
-<a href="produtos.html">Produtos</a>
-<a href="avaliacoes.html">Avaliações</a>
-<a href="sobre.html">Sobre</a>
-</nav>
+  <p>Produto: Conta Exclusiva</p>
+  <p>Valor: R$ 350,00</p>
 
-<main>
+  <p>Forma de pagamento:</p>
+  <p>🔹 Pix</p>
 
-<h1>Pagamento via Pix</h1>
+  <p><strong>Chave Pix:</strong><br>
+  85997629672</p>
 
-<div class="card">
-<p><strong>Chave Pix:</strong></p>
-<p>85997629672</p>
+  <p>Após o pagamento, envie o comprovante no WhatsApp para receber os dados da conta.</p>
 
-<a class="whatsapp-btn"
-href="https://wa.me/5585997629672?text=🔥%20Olá!%20Acabei%20de%20realizar%20o%20pagamento%20via%20Pix%20na%20Mercado%20Alpha.%20Segue%20meu%20comprovante%20para%20confirmação.%20💳✅"
-target="_blank">
-Enviar comprovante no WhatsApp
-</a>
-
+  <a href="https://wa.me/5585997629672">
+    <button class="botao">Enviar Comprovante</button>
+  </a>
 </div>
 
-</main>
-
-<script src="script.js"></script>
 </body>
 </html>
